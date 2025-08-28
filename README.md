@@ -6,7 +6,7 @@
 Buffs In Shop
 </h1>
 
-### Adds many tower buffs to the in game shop that can be directly purchased for towers
+<h3 align="center">Adds many tower buffs to the in game shop that can be directly purchased for towers</h3>
 
 Adds 20+ of the game's buffs as entries into the shop that can be purchased to permanently apply them to a tower.
 
