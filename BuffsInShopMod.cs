@@ -58,7 +58,6 @@ public class BuffsInShopMod : BloonsTD6Mod
                 buff.OnSaved(tower, saveData);
             }
         }
-
     }
 
     public static void OnLateTowerLoaded(Tower tower, TowerSaveDataModel saveData)

@@ -18,117 +18,127 @@ using Il2CppSystem.Collections.Generic;
 
 namespace BuffsInShop;
 
-public static class Patches
+/// <summary>
+/// Hijack a rate mutator for storing mod buff purchase info
+/// </summary>
+[HarmonyPatch(typeof(RateSupportModel.RateSupportMutator), nameof(RateSupportModel.RateSupportMutator.Mutate))]
+internal static class RateSupportMutator_Mutate
 {
-    /// <summary>
-    /// Hijack a rate mutator for storing mod buff purchase info
-    /// </summary>
-    [HarmonyPatch(typeof(RateSupportModel.RateSupportMutator), nameof(RateSupportModel.RateSupportMutator.Mutate))]
-    internal static class RateSupportMutator_Mutate
+    [HarmonyPrefix]
+    internal static bool Prefix(RateSupportModel.RateSupportMutator __instance, Model model, ref bool __result)
     {
-        [HarmonyPrefix]
-        internal static bool Prefix(RateSupportModel.RateSupportMutator __instance, Model model, ref bool __result)
+        if (!ModBuffInShop.Cache.TryGetValue(__instance.id, out var buff) ||
+            !model.Is(out TowerModel tower)) return true;
+
+        __result = true;
+
+        buff.ExtraMutation(tower);
+
+        return false;
+
+    }
+}
+
+/// <summary>
+/// Load towers late after the mutations have been restored
+/// </summary>
+[HarmonyPatch(typeof(MapSaveLoader), nameof(MapSaveLoader.LoadMapSaveData))]
+internal static class MapSaveLoader_LoadMapSaveData
+{
+    [HarmonyPostfix]
+    internal static void Postfix(Simulation sim, MapSaveDataModel mapData)
+    {
+        foreach (var saveData in mapData.placedTowers)
         {
-            if (!ModBuffInShop.Cache.TryGetValue(__instance.id, out var buff) ||
-                !model.Is(out TowerModel tower)) return true;
+            var tower = sim.towerManager.GetTowerById(saveData.IdLastSave);
 
-            __result = true;
-
-            buff.ExtraMutation(tower);
-
-            return false;
-
+            BuffsInShopMod.OnLateTowerLoaded(tower, saveData);
         }
     }
+}
 
-    /// <summary>
-    /// Load towers late after the mutations have been restored
-    /// </summary>
-    [HarmonyPatch(typeof(MapSaveLoader), nameof(MapSaveLoader.LoadMapSaveData))]
-    internal static class MapSaveLoader_LoadMapSaveData
+/// <summary>
+/// Personal free upgrade support
+/// </summary>
+[HarmonyPatch(typeof(TowerManager), nameof(TowerManager.GetFreeUpgrade))]
+internal static class TowerManager_GetFreeUpgrade
+{
+    [HarmonyPostfix]
+    internal static void Postfix(Tower tower, int tier, ref bool __result) =>
+        __result |= tower.towerModel.GetBehaviors<FreeUpgradeSupportModel>()
+            .Any(model => model.upgrade < 0 && tier <= -model.upgrade);
+}
+
+/// <summary>
+/// Personal discount zone
+/// </summary>
+[HarmonyPatch(typeof(TowerManager), nameof(TowerManager.GetZoneDiscount))]
+internal static class TowerManager_GetZoneDiscount
+{
+    [HarmonyPostfix]
+    internal static void Postfix(TowerModel towerModel, Dictionary<string, List<DiscountZone>> __result)
     {
-        [HarmonyPostfix]
-        internal static void Postfix(Simulation sim, MapSaveDataModel mapData)
+        foreach (var discount in towerModel.GetBehaviors<DiscountZoneModModel>())
         {
-            foreach (var saveData in mapData.placedTowers)
+            var discountZoneModel = ModelSerializer.DeserializeModel<DiscountZoneModel>(discount.specificScriptId);
+
+            __result.TryAdd(discountZoneModel.stackName, new List<DiscountZone>());
+
+            __result[discountZoneModel.stackName].Add(new DiscountZone
             {
-                var tower = sim.towerManager.GetTowerById(saveData.IdLastSave);
-
-                BuffsInShopMod.OnLateTowerLoaded(tower, saveData);
-            }
+                discountZoneModel = discountZoneModel
+            });
         }
     }
+}
 
-    /// <summary>
-    /// Personal free upgrade support
-    /// </summary>
-    [HarmonyPatch(typeof(TowerManager), nameof(TowerManager.GetFreeUpgrade))]
-    internal static class TowerManager_GetFreeUpgrade
+/// <summary>
+/// Handle RequireBuffOriginUsable
+/// </summary>
+[HarmonyPatch(typeof(Simulation), nameof(Simulation.StockStandardTowerInventory))]
+internal static class Simulation_StockStandardTowerInventory
+{
+    [HarmonyPostfix]
+    internal static void Postfix(TowerInventory ti)
     {
-        [HarmonyPostfix]
-        internal static void Postfix(Tower tower, int tier, ref bool __result) =>
-            __result |= tower.towerModel.GetBehaviors<FreeUpgradeSupportModel>()
-                .Any(model => model.upgrade < 0 && tier <= -model.upgrade);
-    }
+        if (!BuffsInShopMod.RequireBuffOriginUsable) return;
 
-    /// <summary>
-    /// Personal discount zone
-    /// </summary>
-    [HarmonyPatch(typeof(TowerManager), nameof(TowerManager.GetZoneDiscount))]
-    internal static class TowerManager_GetZoneDiscount
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(TowerModel towerModel, Dictionary<string, List<DiscountZone>> __result)
+        foreach (var buff in ModContent.GetContent<ModBuffInShop>().Where(buff => buff.IsBlocked(ti)))
         {
-            foreach (var discount in towerModel.GetBehaviors<DiscountZoneModModel>())
-            {
-                var discountZoneModel = ModelSerializer.DeserializeModel<DiscountZoneModel>(discount.specificScriptId);
-
-                __result.TryAdd(discountZoneModel.stackName, new List<DiscountZone>());
-
-                __result[discountZoneModel.stackName].Add(new DiscountZone
-                {
-                    discountZoneModel = discountZoneModel
-                });
-            }
+            ti.towerMaxes[buff.Id] = 0;
         }
     }
+}
 
-    /// <summary>
-    /// Handle RequireBuffOriginUsable
-    /// </summary>
-    [HarmonyPatch(typeof(Simulation), nameof(Simulation.StockStandardTowerInventory))]
-    internal static class Simulation_StockStandardTowerInventory
+/// <summary>
+/// Handle buff SubsequentDiscounts
+/// </summary>
+[HarmonyPatch(typeof(TowerInventory))]
+internal static class TowerInventory_TowerChanged
+{
+    private static System.Collections.Generic.IEnumerable<MethodBase> TargetMethods()
     {
-        [HarmonyPostfix]
-        internal static void Postfix(TowerInventory ti)
-        {
-            if (!BuffsInShopMod.RequireBuffOriginUsable) return;
-
-            foreach (var buff in ModContent.GetContent<ModBuffInShop>().Where(buff => buff.IsBlocked(ti)))
-            {
-                ti.towerMaxes[buff.Id] = 0;
-            }
-        }
+        yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.DestroyedTower));
+        yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.CreatedTower));
+        yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.UpdatedTower));
     }
 
-    /// <summary>
-    /// Handle buff SubsequentDiscounts
-    /// </summary>
-    [HarmonyPatch(typeof(TowerInventory))]
-    internal static class TowerInventory_TowerChanged
+    [HarmonyPostfix]
+    internal static void Postfix()
     {
-        private static System.Collections.Generic.IEnumerable<MethodBase> TargetMethods()
-        {
-            yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.DestroyedTower));
-            yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.CreatedTower));
-            yield return AccessTools.Method(typeof(TowerInventory), nameof(TowerInventory.UpdatedTower));
-        }
+        TaskScheduler.ScheduleTask(ModBuffInShop.UpdateDiscounts);
+    }
+}
 
-        [HarmonyPostfix]
-        internal static void Postfix()
-        {
-            TaskScheduler.ScheduleTask(ModBuffInShop.UpdateDiscounts);
-        }
+[HarmonyPatch(typeof(TowerModel), nameof(TowerModel.GetPrimaryWeaponThrowMarkerHeight))]
+internal static class TowerModel_GetPrimaryWeaponThrowMarkerHeight
+{
+    [HarmonyPrefix]
+    internal static bool Prefix(TowerModel __instance, ref float __result)
+    {
+        if (!ModBuffInShop.Cache.ContainsKey(__instance.baseId)) return true;
+
+        __result = 0;
+        return false;
     }
 }

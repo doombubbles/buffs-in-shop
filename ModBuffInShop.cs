@@ -156,6 +156,11 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         return base.Load();
     }
 
+    public override void ModifyBaseTowerModel(TowerModel towerModel)
+    {
+        towerModel.behaviors ??= new Il2CppReferenceArray<Model>(0);
+    }
+
     public override int CompareTo(ModContent other) => this.Compare(other, base.CompareTo, buffs => buffs
         .OrderByDescending(buff => buff.OriginTower == TowerType.Alchemist)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Desperado)
@@ -240,7 +245,11 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual void Apply(Tower tower, float purchaseCost = -1)
     {
         var mutators = GetMutators(tower).ToArray();
-        mutators.ForEach(mutator => mutator.priority += PriorityBoost);
+        mutators.ForEach(mutator =>
+        {
+            mutator.priority += PriorityBoost;
+            mutator.cantBeAbsorbed = true;
+        });
 
         if (purchaseCost > -1)
         {

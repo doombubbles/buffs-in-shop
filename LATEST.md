@@ -1,1 +1,3 @@
-Initial Release
+- All Buffs in Shop are now immune to being absorbed by Lych
+- Fixed an error that could happen with `GetPrimaryWeaponThrowMarkerHeight`
+- Fixed a potential error when the internal CHIMPs mutator would modify the game model
