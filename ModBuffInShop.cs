@@ -61,11 +61,18 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual int[] OriginTiers => [OriginTopPath, OriginMidPath, OriginBotPath];
 
     public virtual TowerModel OriginTowerModel =>
-        OriginTower != null
-            ? GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath)
-            : null!;
+        OriginTower == null
+            ? null!
+            : InGame.instance != null &&
+              GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath).Is(out var current) &&
+              IsValidOrigin(current)
+                ? current
+                : Game.instance.model.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath);
+
     public virtual UpgradeModel? OriginUpgradeModel =>
         OriginTiers.Any(i => i > 0) ? GameModel.GetUpgrade(OriginTowerModel!.appliedUpgrades.Last()) : null;
+
+    public virtual bool IsValidOrigin(TowerModel current) => true;
 
     public float UpgradeCost =>
         OriginTower == null ? 0 : GameModel.GetUpgrade(OriginTowerModel!.appliedUpgrades.Last()).cost;

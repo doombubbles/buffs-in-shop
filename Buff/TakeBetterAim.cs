@@ -16,6 +16,8 @@ public class TakeBetterAim : ModBuffInShop
     public override string OriginTower => TowerType.Desperado;
     public override int OriginMidPath => 4;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<TakeAimModel>();
+
     public override string BaseDescription =>
         "Improves the Take Aim buff on a tower to further improve range and accuracy, and allow damaging Black/White/Purple Bloons.";
     public override float BaseCost => UpgradeCost / 4;

@@ -18,6 +18,8 @@ public class EnergizedFully : ModBuffInShop<Energized>
     public override string OriginTower => TowerType.MonkeySub;
     public override int OriginTopPath => 5;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasBehavior<SubmergeModel>();
+
     public override float BaseCost => UpgradeCost / 2 - GetInstance<Energized>().BaseCost;
     public override string BaseDescription =>
         "Makes an Energized tower have 50% reduced cooldowns if its in water, and/or earn XP 50% faster if its a Hero.";

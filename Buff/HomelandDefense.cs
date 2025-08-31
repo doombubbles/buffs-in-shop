@@ -20,6 +20,8 @@ public class HomelandDefense : ModBuffInShop<CallToArms>
     public override string OriginTower => TowerType.MonkeyVillage;
     public override int OriginMidPath => 5;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<CallToArmsModel>();
+
     public override float BaseCost => UpgradeCost;
     public override string BaseDescription => "Gives a tower with Call to Arms now +100% attack speed and pops.";
     public override KeyCode KeyCode => KeyCode.H;

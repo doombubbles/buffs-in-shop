@@ -16,6 +16,8 @@ public class TakeAim : ModBuffInShop
     public override string OriginTower => TowerType.Desperado;
     public override int OriginMidPath => 3;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<TakeAimModel>();
+
     public override string BaseDescription =>
         "Gives a monkey improved range, accuracy, and Camo detection.";
     public override KeyCode KeyCode => KeyCode.K;

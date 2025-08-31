@@ -23,6 +23,8 @@ public class Energized : ModBuffInShop
     public override KeyCode KeyCode => KeyCode.E;
     public override bool SubsequentDiscount => true;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasBehavior<SubmergeModel>();
+
     public override AudioClipReference? PlacementSound =>
         OriginTowerModel.GetBehavior<SubmergeModel>().submergeSound.assetId;
 

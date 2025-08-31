@@ -17,6 +17,8 @@ public class Ultraboost : ModBuffInShop
     public override string OriginTower => TowerType.EngineerMonkey;
     public override int OriginMidPath => 5;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<OverclockPermanentModel>();
+
     public override float BaseCost => UpgradeCost;
     public override bool SubsequentDiscount => true;
     public override string BaseDescription =>

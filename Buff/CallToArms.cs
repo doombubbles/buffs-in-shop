@@ -12,11 +12,6 @@ namespace BuffsInShop.Buff;
 
 public class CallToArms : ModBuffInShop
 {
-    public override TowerModel OriginTowerModel =>
-        base.OriginTowerModel.HasDescendant<CallToArmsModel>()
-            ? base.OriginTowerModel
-            : Game.instance.model.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath);
-
     public override string OriginTower => TowerType.MonkeyVillage;
     public override int OriginMidPath => 4;
 
@@ -24,6 +19,8 @@ public class CallToArms : ModBuffInShop
     public override string BaseDescription => "Gives a tower +50% attack speed and pops.";
     public override KeyCode KeyCode => KeyCode.C;
     public override bool SubsequentDiscount => true;
+
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<CallToArmsModel>();
 
     public override AudioClipReference? PlacementSound =>
         OriginTowerModel.GetDescendant<CreateSoundOnAbilityModel>().sound.assetId;

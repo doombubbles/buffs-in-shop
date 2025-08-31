@@ -16,6 +16,8 @@ public class Overclock : ModBuffInShop
     public override string OriginTower => TowerType.EngineerMonkey;
     public override int OriginMidPath => 4;
 
+    public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<OverclockModel>();
+
     public override float BaseCost => UpgradeCost;
     public override string BaseDescription =>
         "Supercharges a tower's attack speed, or other effects if it doesn't attack.";
