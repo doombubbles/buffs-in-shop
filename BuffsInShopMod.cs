@@ -10,8 +10,10 @@ using BuffsInShop.Buff;
 using Il2CppAssets.Scripts.Models.Profile;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers;
+using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using MelonLoader;
+using Newtonsoft.Json.Linq;
 
 [assembly: MelonInfo(typeof(BuffsInShopMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -32,6 +34,15 @@ public class BuffsInShopMod : BloonsTD6Mod
     };
 
     private static readonly Dictionary<ModBuffInShop, float> Clipboard = [];
+
+    public override void OnSaveSettings(JObject settings)
+    {
+        foreach (var modBuffInShop in ModContent.GetContent<ModBuffInShop>())
+        {
+            Game.instance.model.GetTower(modBuffInShop.Id).cost = modBuffInShop.Cost;
+            modBuffInShop.AddOrRemoveFromShop();
+        }
+    }
 
     public override void OnRoundEnd() => ModContent.GetInstance<Ultraboost>().HandleBoosting();
 

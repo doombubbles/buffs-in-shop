@@ -1,1 +1,3 @@
-- Fixed some interactions between certain buffs and Ability Choice and Mega Knowledge effects
+- Fixed some interactions with how Buffs apply to subtowers
+- Fixed Absolute Zero placement effect
+- Made Cost settings no longer require a restart to change

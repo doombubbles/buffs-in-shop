@@ -17,11 +17,13 @@ public class BerserkerBrew : ModBuffInShop
 
     public override string OriginTower => TowerType.Alchemist;
     public override int OriginTopPath => 3;
-    public override float BaseCost => UpgradeCost * 5;
+    public override float BaseCost => UpgradeCost * 10;
     public override string BaseDescription =>
         "Gives a tower a brew that increases damage, pierce, range and attack speed.";
     public override KeyCode KeyCode => KeyCode.B;
     public override bool SubsequentDiscount => true;
+
+    public override bool AffectsSubTowers => false;
 
     public override EffectModel? PlacementEffect =>
         AlchemistPerma.GetAttackModel(2).GetDescendant<CreateEffectOnExhaustFractionModel>().effectModel;

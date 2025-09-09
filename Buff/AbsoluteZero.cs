@@ -25,7 +25,7 @@ public class AbsoluteZero : ModBuffInShop
     public override AudioClipReference? PlacementSound =>
         OriginTowerModel.GetDescendant<CreateSoundOnAbilityModel>().sound.assetId;
     public override EffectModel? PlacementEffect =>
-        OriginTowerModel.GetDescendant<TakeAimModel>().initialEffect;
+        OriginTowerModel.GetDescendant<CreateEffectOnAbilityModel>().effectModel;
 
 
     public override bool CanApplyTo(Tower tower, ref string helperMessage)

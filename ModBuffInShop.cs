@@ -104,11 +104,13 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public override bool HighlightTowers => true;
 
+    public virtual bool AffectsSubTowers => true;
+
     public sealed override string Description =>
         BaseDescription +
         (SubsequentDiscount
-             ? "\nSubsequent purchases are less expensive."
-             : "");
+            ? "\nSubsequent purchases are less expensive."
+            : "");
 
     public override void Register()
     {
@@ -144,7 +146,6 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         {
             category = Costs,
             icon = Icon,
-            requiresRestart = true,
             displayName = DisplayName,
             description = $"In Game Cost for {DisplayName}. Set to a negative number to disable the buff."
         };
@@ -165,6 +166,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public override void ModifyBaseTowerModel(TowerModel towerModel)
     {
+        base.ModifyBaseTowerModel(towerModel);
         towerModel.behaviors ??= new Il2CppReferenceArray<Model>(0);
     }
 
@@ -217,8 +219,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     {
         var mutator = tower.GetMutatorById(Id);
         towerCost = mutator?.mutator.Is(out RateSupportModel.RateSupportMutator fakeMutator) == true
-                        ? fakeMutator.multiplier
-                        : -1;
+            ? fakeMutator.multiplier
+            : -1;
         return mutator is not null;
     }
 
@@ -231,7 +233,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public virtual bool CanApplyTo(Tower tower, ref string helperMessage)
     {
-        if (defaultMutators.All(defaultMutator =>
+        if (tower.IsMutatedBy(Id) ||
+            defaultMutators.All(defaultMutator =>
                 tower.GetMutatorById(defaultMutator.id).Is(out var mutator) &&
                 mutator.mutator.priority >= defaultMutator.priority))
         {
@@ -245,6 +248,12 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             return false;
         }
 
+        if (tower.ParentId.IsValid)
+        {
+            helperMessage = "Can't apply directly to sub towers";
+            return false;
+        }
+
         return true;
     }
 
@@ -252,25 +261,46 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual void Apply(Tower tower, float purchaseCost = -1)
     {
         var mutators = GetMutators(tower).ToArray();
-        mutators.ForEach(mutator =>
+        foreach (var mutator in mutators)
         {
             mutator.priority += PriorityBoost;
             mutator.cantBeAbsorbed = true;
-        });
+        }
 
         if (purchaseCost > -1)
         {
-            tower.AddMutator(new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, 0, null));
+            var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, 0, null);
+            if (AffectsSubTowers)
+            {
+                tower.AddMutatorIncludeSubTowers(mutator);
+            } else
+            {
+                tower.AddMutator(mutator);
+            }
         }
 
         foreach (var mutatorId in MutatorIds)
         {
-            tower.RemoveMutatorsById(mutatorId);
+            if (AffectsSubTowers)
+            {
+                tower.RemoveMutatorsIncludeSubTowersById(mutatorId);
+            }
+            else
+            {
+                tower.RemoveMutatorsById(mutatorId);
+            }
         }
 
         foreach (var mutator in mutators)
         {
-            tower.AddMutator(mutator, updateDuration: false);
+            if (AffectsSubTowers)
+            {
+                tower.AddMutatorIncludeSubTowers(mutator);
+            }
+            else
+            {
+                tower.AddMutator(mutator);
+            }
         }
     }
 
@@ -286,20 +316,10 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     {
     }
 
-    public virtual bool IsBlocked(TowerInventory ti)
-    {
-        if (OriginTower == null) return false;
-
-        if (ti.towerMaxes.TryGetValue(OriginTower, out var max) && max == 0)
-        {
-            return true;
-        }
-
-        return OriginTiers.Where((tier, path) => tier != 0 && ti.IsPathTierLocked(new Tower
-        {
-            towerModel = OriginTowerModel
-        }, path, tier)).Any();
-    }
+    public virtual bool IsBlocked(TowerInventory ti) =>
+        OriginTower != null &&
+        (ti.towerMaxes.TryGetValue(OriginTower, out var max) && max == 0 || OriginTiers.Where((tier, path) =>
+            tier != 0 && ti.IsPathTierLocked(new Tower {towerModel = OriginTowerModel}, path, tier)).Any());
 
     internal static void UpdateDiscounts()
     {

@@ -24,6 +24,8 @@ public class StrongerStimulant : ModBuffInShop<BerserkerBrew>
     public override KeyCode KeyCode => KeyCode.S;
     public override bool SubsequentDiscount => true;
 
+    public override bool AffectsSubTowers => false;
+
     public override EffectModel? PlacementEffect =>
         AlchemistPerma.GetAttackModel(2).GetDescendant<CreateEffectOnExhaustFractionModel>().effectModel;
 

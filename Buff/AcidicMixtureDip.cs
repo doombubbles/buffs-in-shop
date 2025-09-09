@@ -24,6 +24,8 @@ public class AcidicMixtureDip : ModBuffInShop
     public override KeyCode KeyCode => KeyCode.A;
     public override bool SubsequentDiscount => true;
 
+    public override bool AffectsSubTowers => false;
+
     public override EffectModel? PlacementEffect =>
         AlchemistPerma.GetAttackModel(1).GetDescendant<CreateEffectOnExhaustFractionModel>().effectModel;
 
