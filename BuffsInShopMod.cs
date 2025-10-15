@@ -33,6 +33,13 @@ public class BuffsInShopMod : BloonsTD6Mod
         icon = VanillaSprites.PrimaryTrainingUpgradeIcon
     };
 
+    public static readonly ModSettingBool AlwaysAffectSubTowers = new(false)
+    {
+        description =
+            "Makes the buffs that don't normally affect sub-towers like Alchemists' and Overclock now affect sub-towers.",
+        icon = VanillaSprites.FasterEngineeringUpgradeIcon
+    };
+
     private static readonly Dictionary<ModBuffInShop, float> Clipboard = [];
 
     public override void OnSaveSettings(JObject settings)

@@ -48,8 +48,10 @@ internal static class MapSaveLoader_LoadMapSaveData
     [HarmonyPostfix]
     internal static void Postfix(Simulation sim, MapSaveDataModel mapData)
     {
+        if (mapData == null) return;
         foreach (var saveData in mapData.placedTowers)
         {
+            if (saveData == null) continue;
             var tower = sim.towerManager.GetTowerById(saveData.IdLastSave);
 
             BuffsInShopMod.OnLateTowerLoaded(tower, saveData);

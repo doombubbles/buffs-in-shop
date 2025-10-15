@@ -267,10 +267,12 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             mutator.cantBeAbsorbed = true;
         }
 
+        var affectsSubTowers = BuffsInShopMod.AlwaysAffectSubTowers || AffectsSubTowers;
+
         if (purchaseCost > -1)
         {
             var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, 0, null);
-            if (AffectsSubTowers)
+            if (affectsSubTowers)
             {
                 tower.AddMutatorIncludeSubTowers(mutator);
             } else
@@ -281,7 +283,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
         foreach (var mutatorId in MutatorIds)
         {
-            if (AffectsSubTowers)
+            if (affectsSubTowers)
             {
                 tower.RemoveMutatorsIncludeSubTowersById(mutatorId);
             }
@@ -293,7 +295,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
         foreach (var mutator in mutators)
         {
-            if (AffectsSubTowers)
+            if (affectsSubTowers)
             {
                 tower.AddMutatorIncludeSubTowers(mutator);
             }

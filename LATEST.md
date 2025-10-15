@@ -1,3 +1,3 @@
-- Fixed some interactions with how Buffs apply to subtowers
-- Fixed Absolute Zero placement effect
-- Made Cost settings no longer require a restart to change
+- Updated for BTD6 v51
+- Added a new setting Always Affect Sub Towers, default false
+  - Makes the buffs that don't normally affect sub-towers like Alchemists' and Overclock now affect sub-towers.

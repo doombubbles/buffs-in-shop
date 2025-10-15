@@ -31,6 +31,8 @@ public class Ultraboost : ModBuffInShop
     public override EffectModel? PlacementEffect =>
         OriginTowerModel.GetDescendant<OverclockModel>().initialEffect;
 
+    public override bool AffectsSubTowers => false;
+
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (!BuffsInShopMod.BypassTowerRestrictions &&

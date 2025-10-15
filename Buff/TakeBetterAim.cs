@@ -28,6 +28,8 @@ public class TakeBetterAim : ModBuffInShop
     public override EffectModel? PlacementEffect =>
         OriginTowerModel.GetDescendant<TakeAimModel>().initialEffect;
 
+    public override bool AffectsSubTowers => false;
+
     public override BehaviorMutator GetMutator(Tower? tower) =>
         OriginTowerModel.GetDescendant<TakeAimModel>().Duplicate().Mutator;
 

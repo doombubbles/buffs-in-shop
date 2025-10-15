@@ -31,6 +31,8 @@ public class Overclock : ModBuffInShop
     public override BehaviorMutator GetMutator(Tower? tower) =>
         OriginTowerModel.GetDescendant<OverclockModel>().Duplicate().Mutator;
 
+    public override bool AffectsSubTowers => false;
+
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (!BuffsInShopMod.BypassTowerRestrictions &&

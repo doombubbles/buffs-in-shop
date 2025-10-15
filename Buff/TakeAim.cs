@@ -27,6 +27,8 @@ public class TakeAim : ModBuffInShop
     public override EffectModel? PlacementEffect =>
         OriginTowerModel.GetDescendant<TakeAimModel>().initialEffect;
 
+    public override bool AffectsSubTowers => false;
+
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (!BuffsInShopMod.BypassTowerRestrictions &&
