@@ -10,6 +10,7 @@ using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using Il2CppSystem.Collections.Generic;
 using UnityEngine;
+
 namespace BuffsInShop.Buff;
 
 public class Ultraboost : ModBuffInShop

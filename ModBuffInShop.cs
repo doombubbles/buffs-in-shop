@@ -6,6 +6,7 @@ using BTD_Mod_Helper.Api.Data;
 using BTD_Mod_Helper.Api.ModOptions;
 using BTD_Mod_Helper.Api.Towers;
 using BTD_Mod_Helper.Extensions;
+using BuffsInShop.Buff;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Effects;
 using Il2CppAssets.Scripts.Models.Profile;
@@ -38,9 +39,16 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public static readonly ModSettingCategory Hotkeys = new("Hotkeys");
 
+    public static readonly ModSettingCategory GodBoosting = new("God Boost")
+    {
+        icon = GetTextureGUID<BuffsInShopMod>(nameof(GodBoost)),
+    };
+
+
     protected BehaviorMutator[] defaultMutators = null!;
     private ModSettingInt cost = null!;
     private ModSettingHotkey hotkey = null!;
+    private ModSettingBool includeInGodBoost = null!;
 
     public static Simulation Sim => InGame.Bridge.Simulation;
 
@@ -52,13 +60,14 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual KeyCode KeyCode => KeyCode.None;
     public virtual bool SubsequentDiscount => false;
     public virtual int PriorityBoost => 1;
-
+    public virtual bool AllowInChimps => true;
 
     public abstract string? OriginTower { get; }
     public virtual int OriginTopPath => 0;
     public virtual int OriginMidPath => 0;
     public virtual int OriginBotPath => 0;
     public virtual int[] OriginTiers => [OriginTopPath, OriginMidPath, OriginBotPath];
+    public virtual bool DefaultGodBoost => mod is BuffsInShopMod;
 
     public virtual TowerModel OriginTowerModel =>
         OriginTower == null
@@ -101,6 +110,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public override int Cost => SavedBaseCost == null ? (int) BaseCost : cost;
     public override bool DontAddToShop => Cost < 0;
     private int? SavedBaseCost => BaseCosts.Value<int?>(Name);
+    public bool IncludeInGodBoost => this is not GodBoost && includeInGodBoost;
 
     public override bool HighlightTowers => true;
 
@@ -142,16 +152,15 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             }
         }
 
-        cost = new ModSettingInt(baseCost.Value)
+        mod.ModSettings[Name + "Cost"] = cost = new ModSettingInt(baseCost.Value)
         {
             category = Costs,
             icon = Icon,
             displayName = DisplayName,
             description = $"In Game Cost for {DisplayName}. Set to a negative number to disable the buff."
         };
-        mod.ModSettings[Name + "Cost"] = cost;
 
-        hotkey = new ModSettingHotkey(KeyCode,
+        mod.ModSettings[Name + "HotKey"] = hotkey = new ModSettingHotkey(KeyCode,
             KeyCode == KeyCode.None ? HotkeyModifier.None : HotkeyModifier.Alt)
         {
             category = Hotkeys,
@@ -159,7 +168,18 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             displayName = DisplayName,
             description = $"Hot Key for {DisplayName}"
         };
-        mod.ModSettings[Name + "HotKey"] = hotkey;
+
+        if (this is not GodBoost)
+        {
+            mod.ModSettings[Name + "GodBoosting"] = includeInGodBoost = new ModSettingBool(DefaultGodBoost)
+            {
+                category = GodBoosting,
+                icon = Icon,
+                displayName = DisplayName,
+                description = $"Whether {DisplayName} should be included within the God Boost buff. " +
+                              $"Reminder: Still follows the Bypass Tower Restrictions setting."
+            };
+        }
 
         return base.Load();
     }
@@ -171,7 +191,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     }
 
     public override int CompareTo(ModContent other) => this.Compare(other, base.CompareTo, buffs => buffs
-        .OrderByDescending(buff => buff.OriginTower == TowerType.Alchemist)
+        .OrderBy(buff => buff.Order)
+        .ThenByDescending(buff => buff.OriginTower == TowerType.Alchemist)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Desperado)
         .ThenByDescending(buff => buff.OriginTower == TowerType.EngineerMonkey)
         .ThenByDescending(buff => buff.OriginTower == TowerType.MonkeyVillage)
@@ -234,6 +255,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (tower.IsMutatedBy(Id) ||
+            defaultMutators.Length > 0 &&
             defaultMutators.All(defaultMutator =>
                 tower.GetMutatorById(defaultMutator.id).Is(out var mutator) &&
                 mutator.mutator.priority >= defaultMutator.priority))
@@ -275,7 +297,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             if (affectsSubTowers)
             {
                 tower.AddMutatorIncludeSubTowers(mutator);
-            } else
+            }
+            else
             {
                 tower.AddMutator(mutator);
             }

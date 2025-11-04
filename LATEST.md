@@ -1,3 +1,3 @@
-- Updated for BTD6 v51
-- Added a new setting Always Affect Sub Towers, default false
-  - Makes the buffs that don't normally affect sub-towers like Alchemists' and Overclock now affect sub-towers.
+- Added a new "God Boost" buff that applies all other buffs to a tower at once
+- Fixed Take Better Aim being applyable to a tower without Take Aim
+- Hid some buffs from the shop in Chimps that don't actually do anything 

@@ -8,6 +8,7 @@ using BTD_Mod_Helper;
 using BTD_Mod_Helper.Api.Commands;
 using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
+using BuffsInShop.Buff;
 using HarmonyLib;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using MelonLoader;
@@ -47,7 +48,7 @@ internal static class Commands
 
         public static IEnumerator Execute()
         {
-            foreach (var buff in GetContent<ModBuffInShop>().Where(shop => shop.mod is BuffsInShopMod))
+            foreach (var buff in GetContent<ModBuffInShop>().Where(b => b.mod is BuffsInShopMod && b is not GodBoost))
             {
                 var buffIndicator = buff
                     .GetMutators(null)
