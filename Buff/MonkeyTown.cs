@@ -16,6 +16,8 @@ public class MonkeyTown : ModBuffInShop
     public override KeyCode KeyCode => KeyCode.W;
     public override bool SubsequentDiscount => true;
 
+    public override bool AllowInChimps => false;
+
     public override BehaviorMutator GetMutator(Tower? tower) =>
         OriginTowerModel.GetBehavior<AddBehaviorToTowerSupportModel>("CashUp").CreateMutator();
 }

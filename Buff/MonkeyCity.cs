@@ -18,6 +18,8 @@ public class MonkeyCity : ModBuffInShop
     public override KeyCode KeyCode => KeyCode.Y;
     public override bool SubsequentDiscount => true;
 
+    public override bool AllowInChimps => false;
+
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (!BuffsInShopMod.BypassTowerRestrictions && !defaultMutators.First()

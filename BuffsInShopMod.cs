@@ -7,6 +7,8 @@ using BTD_Mod_Helper.Api.ModOptions;
 using BTD_Mod_Helper.Extensions;
 using BuffsInShop;
 using BuffsInShop.Buff;
+using Il2CppAssets.Scripts.Data;
+using Il2CppAssets.Scripts.Models.Gameplay.Mods;
 using Il2CppAssets.Scripts.Models.Profile;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers;
@@ -41,6 +43,17 @@ public class BuffsInShopMod : BloonsTD6Mod
     };
 
     private static readonly Dictionary<ModBuffInShop, float> Clipboard = [];
+
+    public override void OnTitleScreen()
+    {
+        var chimps = GameData.Instance.mods.FirstOrDefault(model => model.name == "Clicks");
+        if (chimps == null) return;
+
+        foreach (var buff in ModContent.GetContent<ModBuffInShop>().Where(buff => !buff.AllowInChimps))
+        {
+            chimps.AddMutator(new LockTowerModModel("", buff.Id));
+        }
+    }
 
     public override void OnSaveSettings(JObject settings)
     {
