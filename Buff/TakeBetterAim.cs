@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace BuffsInShop.Buff;
 
-public class TakeBetterAim : ModBuffInShop
+public class TakeBetterAim : ModBuffInShop<TakeAim>
 {
     public override string OriginTower => TowerType.Desperado;
     public override int OriginMidPath => 4;
