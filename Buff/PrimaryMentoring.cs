@@ -14,7 +14,7 @@ public class PrimaryMentoring : ModBuffInShop<PrimaryTraining>
     public override int OriginTopPath => 4;
 
     public override string BaseDescription =>
-        "Gives a Monkey with Primary Training increased range, tier 1 upgrades for free, and reduced ability cooldowns.";
+        "Gives a tower with Primary Training increased range, tier 1 upgrades for free, and reduced ability cooldowns.";
     public override KeyCode KeyCode => KeyCode.M;
     public override bool SubsequentDiscount => true;
 

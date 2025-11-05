@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PhotoSauce.MagicScaler;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Math = Il2CppAssets.Scripts.Simulation.SMath.Math;
 
 namespace BuffsInShop;
@@ -50,15 +51,25 @@ internal static class Commands
         {
             foreach (var buff in GetContent<ModBuffInShop>().Where(b => b.mod is BuffsInShopMod && b is not GodBoost))
             {
-                var buffIndicator = buff
-                    .GetMutators(null)
-                    .Select(mutator => mutator.buffIndicator)
-                    .Where(buffIndicator => buffIndicator != null && !string.IsNullOrEmpty(buffIndicator.FullName))
-                    .OrderByDescending(buffIndicator => buffIndicator.iconName)
-                    .First()
-                    .GetIcon();
+                AsyncOperationHandle<Sprite> getSprite;
+                try
+                {
+                    var buffIndicator = buff
+                        .GetMutators(null)
+                        .Select(mutator => mutator.buffIndicator)
+                        .Where(buffIndicator => buffIndicator != null && !string.IsNullOrEmpty(buffIndicator.FullName))
+                        .OrderByDescending(buffIndicator => buffIndicator.iconName)
+                        .First()
+                        .GetIcon();
 
-                var getSprite = ResourceLoader.LoadAsync<Sprite>(buffIndicator.icon.AssetGUID);
+                    getSprite = ResourceLoader.LoadAsync<Sprite>(buffIndicator.icon.AssetGUID);
+                }
+                catch (Exception e)
+                {
+                    ModHelper.Warning<BuffsInShopMod>($"Failed to get icon for {buff.Name}");
+                    ModHelper.Warning<BuffsInShopMod>(e);
+                    continue;
+                }
                 yield return getSprite;
 
                 var sprite = getSprite.Result.PadSpriteToScale(.75f).PadSpriteToSquare();

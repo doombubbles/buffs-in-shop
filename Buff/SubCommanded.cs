@@ -13,7 +13,7 @@ public class SubCommanded : ModBuffInShop
     public override string OriginTower => TowerType.MonkeySub;
     public override int OriginBotPath => 5;
 
-    public override float BaseCost => 5000;
+    public override float BaseCost => 10000;
     public override string BaseDescription => "Gives a Monkey Sub extra pierce and damage.";
     public override KeyCode KeyCode => KeyCode.D;
     public override bool SubsequentDiscount => true;

@@ -15,7 +15,7 @@ public class PrimaryExpertise : ModBuffInShop<PrimaryMentoring>
 
     public override float BaseCost => UpgradeCost / 5;
     public override string BaseDescription =>
-        "Gives a Monkey with Primary Mentoring more popping power, tier 2 upgrades for free, and further reduced ability cooldowns.";
+        "Gives a tower with Primary Mentoring more popping power, tier 2 upgrades for free, and further reduced ability cooldowns.";
     public override KeyCode KeyCode => KeyCode.X;
     public override bool SubsequentDiscount => true;
 

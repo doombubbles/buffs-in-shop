@@ -42,7 +42,7 @@ public class BuffsInShopMod : BloonsTD6Mod
         icon = VanillaSprites.FasterEngineeringUpgradeIcon
     };
 
-    private static readonly Dictionary<ModBuffInShop, float> Clipboard = [];
+    private static readonly Dictionary<ModBuffInShop, (float cost, int stacks)> Clipboard = [];
 
     public override void OnTitleScreen()
     {
@@ -86,6 +86,10 @@ public class BuffsInShopMod : BloonsTD6Mod
             {
                 var fakeMutator = mutator.mutator.Cast<RateSupportModel.RateSupportMutator>();
                 saveData.metaData[buff.Id] = $"{fakeMutator.multiplier}";
+                if (fakeMutator.priority > 1)
+                {
+                    saveData.metaData[buff.Id + "Count"] = fakeMutator.priority.ToString();
+                }
                 buff.OnSaved(tower, saveData);
             }
         }
@@ -95,9 +99,16 @@ public class BuffsInShopMod : BloonsTD6Mod
     {
         foreach (var (id, buff) in ModBuffInShop.Cache)
         {
-            if (saveData.metaData.TryGetValue(id, out var value) && float.TryParse(value, out var cost))
+            if (saveData.metaData.TryGetValue(id, out var f) && float.TryParse(f, out var cost))
             {
                 buff.Apply(tower, cost);
+                if (saveData.metaData.TryGetValue(id + "Count", out var i) && int.TryParse(i, out var count))
+                {
+                    for (var j = 1; j < count; j++)
+                    {
+                        buff.Apply(tower, 0);
+                    }
+                }
             }
         }
 
@@ -120,14 +131,18 @@ public class BuffsInShopMod : BloonsTD6Mod
                 {
                     if (buff.HasBuff(tower, out var cost))
                     {
-                        Clipboard[buff] = cost;
+                        Clipboard[buff] = (cost, buff.StackCount(tower));
                     }
                 }
                 break;
             case "OnTowerPasted" when parameters.CheckTypes(out Tower tower):
-                foreach (var (buff, cost) in Clipboard)
+                foreach (var (buff, (cost, stacks)) in Clipboard)
                 {
-                    buff.Apply(tower, cost);
+                    buff.Apply(tower, cost, true);
+                    for (var i = 1; i < stacks; i++)
+                    {
+                        buff.Apply(tower, 0, true);
+                    }
                 }
                 break;
             case "OnClipboardCleared":

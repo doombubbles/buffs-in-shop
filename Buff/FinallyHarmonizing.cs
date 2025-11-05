@@ -21,7 +21,8 @@ public class FinallyHarmonizing : ModBuffInShop
 
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
-        if (!tower.towerModel.CheckSet(TowerSet.Magic, false) && !tower.towerModel.IsHero())
+        if (!BuffsInShopMod.BypassTowerRestrictions && !tower.towerModel.CheckSet(TowerSet.Magic, false) &&
+            !tower.towerModel.IsHero())
         {
             helperMessage = "Must be a Magic monkey or Hero.";
             return false;
@@ -34,14 +35,16 @@ public class FinallyHarmonizing : ModBuffInShop
     {
         if (BuffsInShopMod.BypassTowerRestrictions || tower == null || tower.towerModel.IsHero())
         {
-            yield return OriginTowerModel.GetDescendant<TowerModel>().GetDescendant<RangeSupportModel>().CreateMutator();
+            yield return OriginTowerModel.GetDescendant<TowerModel>().GetDescendant<RangeSupportModel>()
+                .CreateMutator();
             yield return OriginTowerModel.GetDescendant<TowerModel>().GetDescendant<AbilityCooldownScaleSupportModel>()
                 .CreateMutator();
         }
 
         if (BuffsInShopMod.BypassTowerRestrictions || tower == null || tower.towerModel.CheckSet(TowerSet.Magic, false))
         {
-            yield return OriginTowerModel.GetDescendant<TowerModel>().GetDescendant<PierceSupportModel>().CreateMutator();
+            yield return OriginTowerModel.GetDescendant<TowerModel>().GetDescendant<PierceSupportModel>()
+                .CreateMutator();
         }
     }
 

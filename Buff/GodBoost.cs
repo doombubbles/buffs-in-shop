@@ -17,21 +17,23 @@ public class GodBoost : ModBuffInShop
 
     public override IEnumerable<BehaviorMutator> GetMutators(Tower? tower) => [];
 
-    public override void Apply(Tower tower, float purchaseCost = -1)
+    public override void Apply(Tower tower, float purchaseCost = -1, bool sideEffects = false)
     {
-        base.Apply(tower, purchaseCost);
+        base.Apply(tower, purchaseCost, sideEffects);
+
+        if (!sideEffects) return;
 
         foreach (var buff in GetContent<ModBuffInShop>().OrderBy(buff => buff.PriorityBoost))
         {
             var _ = "";
             if (buff.IncludeInGodBoost && buff.CanApplyTo(tower, ref _))
             {
-                buff.Apply(tower, 0);
-                if (buff is Ultraboost)
+                buff.Apply(tower, 0, true);
+                if (buff.MaxStacks > 1)
                 {
-                    for (var i = 0; i < 9; i++)
+                    for (var i = 1; i < buff.MaxStacks; i++)
                     {
-                        buff.Apply(tower);
+                        buff.Apply(tower, 0, sideEffects);
                     }
                 }
             }

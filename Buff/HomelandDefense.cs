@@ -4,7 +4,6 @@ using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Simulation.Towers;
-using Il2CppAssets.Scripts.Unity;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using UnityEngine;
 
@@ -12,11 +11,6 @@ namespace BuffsInShop.Buff;
 
 public class HomelandDefense : ModBuffInShop<CallToArms>
 {
-    public override TowerModel OriginTowerModel =>
-        base.OriginTowerModel.HasDescendant<CallToArmsModel>()
-            ? base.OriginTowerModel
-            : Game.instance.model.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath);
-
     public override string OriginTower => TowerType.MonkeyVillage;
     public override int OriginMidPath => 5;
 
@@ -26,7 +20,6 @@ public class HomelandDefense : ModBuffInShop<CallToArms>
     public override string BaseDescription => "Gives a tower with Call to Arms now +100% attack speed and pops.";
     public override KeyCode KeyCode => KeyCode.H;
     public override bool SubsequentDiscount => true;
-    public override int PriorityBoost => base.PriorityBoost + 1;
 
     public override AudioClipReference? PlacementSound =>
         OriginTowerModel.GetDescendant<CreateSoundOnAbilityModel>().sound.assetId;

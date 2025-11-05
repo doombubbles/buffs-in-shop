@@ -68,18 +68,21 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual int OriginBotPath => 0;
     public virtual int[] OriginTiers => [OriginTopPath, OriginMidPath, OriginBotPath];
     public virtual bool DefaultGodBoost => mod is BuffsInShopMod;
+    public virtual bool Hero => false;
+    public virtual int MaxStacks => 1;
 
-    public virtual TowerModel OriginTowerModel =>
-        OriginTower == null
-            ? null!
-            : InGame.instance != null &&
-              GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath).Is(out var current) &&
-              IsValidOrigin(current)
+    private TowerModel? originTowerModel;
+    public virtual TowerModel OriginTowerModel => OriginTower == null
+        ? null!
+        : originTowerModel ??=
+            InGame.instance != null &&
+            GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath).Is(out var current) &&
+            IsValidOrigin(current)
                 ? current
                 : Game.instance.model.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath);
 
     public virtual UpgradeModel? OriginUpgradeModel =>
-        OriginTiers.Any(i => i > 0) ? GameModel.GetUpgrade(OriginTowerModel!.appliedUpgrades.Last()) : null;
+        OriginTiers.Any(i => i > 0) ? GameModel.GetUpgrade(OriginTowerModel.appliedUpgrades.Last()) : null;
 
     public virtual bool IsValidOrigin(TowerModel current) => true;
 
@@ -132,6 +135,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         {
             defaultMutator.priority += PriorityBoost;
         }
+        originTowerModel = null;
 
         Cache[Id] = this;
     }
@@ -190,15 +194,21 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         towerModel.behaviors ??= new Il2CppReferenceArray<Model>(0);
     }
 
+    public override void ModifyTowerModelForMatch(TowerModel towerModel, GameModel gameModel)
+    {
+        originTowerModel = null;
+    }
+
     public override int CompareTo(ModContent other) => this.Compare(other, base.CompareTo, buffs => buffs
         .OrderBy(buff => buff.Order)
+        .ThenBy(buff => buff.Hero)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Alchemist)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Desperado)
         .ThenByDescending(buff => buff.OriginTower == TowerType.EngineerMonkey)
         .ThenByDescending(buff => buff.OriginTower == TowerType.MonkeyVillage)
         .ThenByDescending(buff => buff.OriginTower != TowerType.SuperMonkey)
         .ThenBy(buff => buff.OriginTower != null ? TowerType.towers.IndexOf(buff.OriginTower) : 999)
-        .ThenBy(buff => $"{buff.OriginBotPath}{buff.OriginMidPath}{buff.OriginTopPath}")
+        .ThenBy(buff => (buff.OriginBotPath, buff.OriginMidPath, buff.OriginTopPath))
     );
 
     public override bool CanPlaceAt(Vector2 at, Tower? tower, ref string helperMessage)
@@ -229,10 +239,15 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         if (hoveredTower == null) return;
 
         hoveredTower.worth += towerCost;
-        Apply(hoveredTower, towerCost);
+        Apply(hoveredTower, towerCost, true);
 
         UpdateDiscounts();
     }
+
+    public int StackCount(Tower? tower) =>
+        tower?.GetMutatorById(Id)?.mutator.Is(out RateSupportModel.RateSupportMutator rateSupportMutator) == true
+            ? rateSupportMutator.priority
+            : 0;
 
     public bool HasBuff(Tower tower) => tower.GetMutatorById(Id) != null;
 
@@ -254,8 +269,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public virtual bool CanApplyTo(Tower tower, ref string helperMessage)
     {
-        if (tower.IsMutatedBy(Id) ||
-            defaultMutators.Length > 0 &&
+        if (StackCount(tower) >= MaxStacks ||
+            MaxStacks == 1 && defaultMutators.Length > 0 &&
             defaultMutators.All(defaultMutator =>
                 tower.GetMutatorById(defaultMutator.id).Is(out var mutator) &&
                 mutator.mutator.priority >= defaultMutator.priority))
@@ -280,7 +295,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     }
 
 
-    public virtual void Apply(Tower tower, float purchaseCost = -1)
+    public virtual void Apply(Tower tower, float purchaseCost = -1, bool sideEffects = false)
     {
         var mutators = GetMutators(tower).ToArray();
         foreach (var mutator in mutators)
@@ -293,15 +308,12 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
         if (purchaseCost > -1)
         {
-            var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, 0, null);
-            if (affectsSubTowers)
+            var count = StackCount(tower);
+            var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, count + 1, null)
             {
-                tower.AddMutatorIncludeSubTowers(mutator);
-            }
-            else
-            {
-                tower.AddMutator(mutator);
-            }
+                cantBeAbsorbed = true
+            };
+            tower.AddMutator(mutator);
         }
 
         foreach (var mutatorId in MutatorIds)

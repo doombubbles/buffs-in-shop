@@ -3,19 +3,20 @@ using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Simulation.Towers;
-using UnityEngine;
 
 namespace BuffsInShop.Buff;
 
-public class MonkeyVillager : ModBuffInShop
+public class EtienneRange : ModBuffInShop
 {
-    public override string OriginTower => TowerType.MonkeyVillage;
-    public override float BaseCost => TowerCost / 2;
-    public override string BaseDescription => "Gives a tower 10% increased range.";
-    public override KeyCode KeyCode => KeyCode.V;
+    public override string? OriginTower => TowerType.Etienne;
+    public override int OriginTopPath => 19;
+    public override bool Hero => true;
+
+    public override string BaseDescription => "Give a tower 20% increased range.";
+
+    public override float BaseCost => 900;
     public override bool SubsequentDiscount => true;
 
     public override BehaviorMutator GetMutator(Tower? tower) =>
         OriginTowerModel.GetBehavior<RangeSupportModel>().CreateMutator();
-
 }

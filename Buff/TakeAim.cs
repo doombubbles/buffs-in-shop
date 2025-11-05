@@ -19,7 +19,7 @@ public class TakeAim : ModBuffInShop
     public override bool IsValidOrigin(TowerModel current) => current.HasDescendant<TakeAimModel>();
 
     public override string BaseDescription =>
-        "Gives a monkey improved range, accuracy, and Camo detection.";
+        "Gives a tower improved range, accuracy, and Camo detection.";
     public override KeyCode KeyCode => KeyCode.K;
 
     public override AudioClipReference? PlacementSound =>

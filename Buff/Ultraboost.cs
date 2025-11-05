@@ -34,6 +34,8 @@ public class Ultraboost : ModBuffInShop
 
     public override bool AffectsSubTowers => false;
 
+    public override int MaxStacks => 10;
+
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
         if (!BuffsInShopMod.BypassTowerRestrictions &&

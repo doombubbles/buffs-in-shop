@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BTD_Mod_Helper.Api;
+using BTD_Mod_Helper.Api.Display;
 using BTD_Mod_Helper.Extensions;
 using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Data.Global;
@@ -8,7 +10,9 @@ using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Mutators;
+using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Weapons.Behaviors;
+using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Mutators;
@@ -97,10 +101,79 @@ public static class Extensions
         activateRateSupportZoneModel.mutatorId, activateRateSupportZoneModel.rateModifier, 0,
         activateRateSupportZoneModel.GetBuffIndicatorModel());
 
+    public static PierceSupport.MutatorTower CreateMutator(
+        this ActivatePierceSupportZoneModel activatePierceSupportZoneModel) => new(new PierceSupport
+    {
+        pierceSupportModel = new PierceSupportModel("", activatePierceSupportZoneModel.isUnique,
+            activatePierceSupportZoneModel.pierceIncrease, activatePierceSupportZoneModel.mutatorId,
+            activatePierceSupportZoneModel.filters, activatePierceSupportZoneModel.isGlobal,
+            activatePierceSupportZoneModel.buffLocsName, activatePierceSupportZoneModel.buffIconName)
+    });
+
+    public static DamageSupport.MutatorTower CreateMutator(
+        this ActivateTowerDamageSupportZoneModel activateTowerDamageSupportZoneModel) => new(
+        activateTowerDamageSupportZoneModel.damageIncrease, activateTowerDamageSupportZoneModel.isUnique,
+        activateTowerDamageSupportZoneModel.mutatorId, activateTowerDamageSupportZoneModel.GetBuffIndicatorModel());
+
+    public static VisibilitySupport.MutatorTower CreateMutator(
+        this ActivateVisibilitySupportZoneModel activateVisibilitySupportZoneModel) => new(new VisibilitySupport
+    {
+        visibilitySupportModel = new VisibilitySupportModel("", activateVisibilitySupportZoneModel.isUnique,
+            activateVisibilitySupportZoneModel.mutatorId, activateVisibilitySupportZoneModel.isGlobal,
+            activateVisibilitySupportZoneModel.filters, activateVisibilitySupportZoneModel.buffLocsName,
+            activateVisibilitySupportZoneModel.buffIconName)
+    });
+
     public static DamageTypeSupport.MutatorTower CreateMutator(
         this DamageTypeSupportModel damageTypeSupportModel) => new(damageTypeSupportModel.mutatorId,
         damageTypeSupportModel.isUnique, damageTypeSupportModel.GetBuffIndicatorModel(),
         damageTypeSupportModel.immuneBloonProperties);
+
+    public static PierceUpTowersModel.PierceUpMutator CreateMutator(
+        this PierceUpTowersModel pierceUpTowersModel) => new(pierceUpTowersModel.increase,
+        pierceUpTowersModel.mutatorId, pierceUpTowersModel.priority, pierceUpTowersModel);
+
+    public static DamageUpTowersModel.DamageUpMutator CreateMutator(
+        this DamageUpTowersModel damageUpTowersModel) => new(damageUpTowersModel.increase,
+        damageUpTowersModel.mutatorId, damageUpTowersModel.priority);
+
+    public static DamageUpTagTowersModel.DamageUpTagMutator CreateMutator(
+        this DamageUpTagTowersModel damageUpTagTowersModel) => new(damageUpTagTowersModel);
+
+
+    public static HeatItUpDamageBuffModel.HeatItUpDamageMutator CreateMutator(
+        this HeatItUpDamageBuffModel heatItUpDamageBuffModel) => new(heatItUpDamageBuffModel.mutatorId,
+        heatItUpDamageBuffModel.GetBuffIndicatorModel());
+
+    public static RateSupportBombExpert.MutatorTower CreateMutator(
+        this RateSupportBombExpertModel rateSupportBombExpertModel) => new(new RateSupportBombExpert
+    {
+        rateSupportBombExpertModel = rateSupportBombExpertModel
+    });
+
+    public static RateSupportExplosive.MutatorTower CreateMutator(
+        this RateSupportExplosiveModel rateSupportExplosiveModel) => new(new RateSupportExplosive
+    {
+        rateSupportExplosiveModel = rateSupportExplosiveModel
+    });
+
+    public static ProjectileRadiusSupport.MutatorTower CreateMutator(
+        this ProjectileRadiusSupportModel rateSupportBombExpertModel) => new(new ProjectileRadiusSupport
+    {
+        projectileRadiusSupportModel = rateSupportBombExpertModel
+    });
+
+    public static FreezeDurationSupport.MutatorTower CreateMutator(
+        this FreezeDurationSupportModel freezeDurationSupportModel) => new(freezeDurationSupportModel.isUnique,
+        freezeDurationSupportModel.mutatorId, freezeDurationSupportModel.additive,
+        freezeDurationSupportModel.multiplier, freezeDurationSupportModel.GetBuffIndicatorModel());
+
+    public static SupportShinobiTactics.MutatorTower CreateMutator(
+        this SupportShinobiTacticsModel supportShinobiTacticsModel) => new(new SupportShinobiTactics
+    {
+        supportShinobiTacticsModel = supportShinobiTacticsModel
+    }, supportShinobiTacticsModel.mutatorId);
+
 
 
 
@@ -132,5 +205,11 @@ public static class Extensions
         Func<IEnumerable<T>, IEnumerable<T>> orderBy) where T : IComparable<TBase>, TBase
     {
         return (self, unknown).Compare(orderBy, fallback);
+    }
+
+    public static BehaviorMutator ApplyBuffIcon<T>(this BehaviorMutator mutator) where T : ModBuffIcon
+    {
+        mutator.buffIndicator = ModContent.GetInstance<T>().CreateBuffIndicatorModel();
+        return mutator;
     }
 }
