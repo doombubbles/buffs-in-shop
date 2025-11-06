@@ -45,7 +45,7 @@ public class Overclock : ModBuffInShop
         return base.CanApplyTo(tower, ref helperMessage);
     }
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         var overclock = OriginTowerModel.GetDescendant<OverclockModel>();
 
@@ -54,5 +54,7 @@ public class Overclock : ModBuffInShop
         {
             towerModel.AddBehavior(new DisplayModel(Name, overclock.buffDisplayPath, -1, DisplayCategory.Buff));
         }
+
+        return true;
     }
 }

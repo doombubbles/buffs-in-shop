@@ -10,7 +10,7 @@ namespace BuffsInShop.Buff;
 
 public class IceAge : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.Silas;
+    public override string OriginTower => TowerType.Silas;
     public override int OriginTopPath => 19;
     public override bool Hero => true;
 

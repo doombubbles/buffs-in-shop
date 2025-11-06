@@ -73,7 +73,7 @@ public class Ultraboost : ModBuffInShop
         return ultraboost.MutatorByStack(stacks);
     }
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         var overclock = OriginTowerModel.GetDescendant<OverclockModel>();
 
@@ -85,6 +85,8 @@ public class Ultraboost : ModBuffInShop
         }
 
         towerModel.AddBehavior(new DisplayModel("Overclock", overclock.buffDisplayPath, -1, DisplayCategory.Buff));
+
+        return true;
     }
 
     public void HandleBoosting()

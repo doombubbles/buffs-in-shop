@@ -70,12 +70,14 @@ public class SunTemple : ModBuffInShop
         }
     }
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         ExtraMutation(towerModel, OriginTowerModel);
+
+        return true;
     }
 
-    public static void ExtraMutation(TowerModel towerModel, TowerModel monkey)
+    public static bool ExtraMutation(TowerModel towerModel, TowerModel monkey)
     {
         var discount = monkey
             .GetBehaviors<TempleTowerMutatorGroupModel>()
@@ -87,5 +89,7 @@ public class SunTemple : ModBuffInShop
 
         towerModel.AddBehavior(new DiscountZoneModModel(discount.stackName, discount.discountMultiplier,
             ModelSerializer.SerializeModel(discount)));
+
+        return true;
     }
 }

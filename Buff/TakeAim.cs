@@ -45,7 +45,7 @@ public class TakeAim : ModBuffInShop
     public override BehaviorMutator GetMutator(Tower? tower) =>
         OriginTowerModel.GetDescendant<TakeAimModel>().Duplicate().Mutator;
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         var takeAim = OriginTowerModel.GetDescendant<TakeAimModel>();
 
@@ -53,5 +53,7 @@ public class TakeAim : ModBuffInShop
         {
             towerModel.AddBehavior(new DisplayModel(Name, takeAim.buffDisplayPath, -1, DisplayCategory.Buff));
         }
+
+        return true;
     }
 }

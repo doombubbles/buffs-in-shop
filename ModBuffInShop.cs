@@ -39,6 +39,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public static readonly ModSettingCategory Hotkeys = new("Hotkeys");
 
+    public static readonly ModSettingCategory Always = new("Always Usable");
+
     public static readonly ModSettingCategory GodBoosting = new("God Boost")
     {
         icon = GetTextureGUID<BuffsInShopMod>(nameof(GodBoost)),
@@ -49,20 +51,24 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     private ModSettingInt cost = null!;
     private ModSettingHotkey hotkey = null!;
     private ModSettingBool includeInGodBoost = null!;
+    private ModSettingBool alwaysUsable = null!;
 
     public static Simulation Sim => InGame.Bridge.Simulation;
 
     public static GameModel GameModel => InGame.instance == null ? Game.instance.model : Sim.model;
 
 
-    public virtual float BaseCost => UpgradeCost / 2;
+    public abstract string? OriginTower { get; }
     public abstract string BaseDescription { get; }
+
+    public float UpgradeCost => OriginTower == null ? 0 : OriginUpgradeModel?.cost ?? 0;
+    public float TowerCost => OriginTowerModel?.cost ?? 0;
+
+    public virtual float BaseCost => UpgradeCost / 2;
     public virtual KeyCode KeyCode => KeyCode.None;
     public virtual bool SubsequentDiscount => false;
     public virtual int PriorityBoost => 1;
     public virtual bool AllowInChimps => true;
-
-    public abstract string? OriginTower { get; }
     public virtual int OriginTopPath => 0;
     public virtual int OriginMidPath => 0;
     public virtual int OriginBotPath => 0;
@@ -70,25 +76,23 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public virtual bool DefaultGodBoost => mod is BuffsInShopMod;
     public virtual bool Hero => false;
     public virtual int MaxStacks => 1;
+    public virtual bool ParagonAllowed => false;
+
 
     private TowerModel? originTowerModel;
     public virtual TowerModel OriginTowerModel => OriginTower == null
         ? null!
         : originTowerModel ??=
             InGame.instance != null &&
-            GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath).Is(out var current) &&
+            GameModel.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath)?.Is(out var current) == true &&
             IsValidOrigin(current)
                 ? current
                 : Game.instance.model.GetTower(OriginTower, OriginTopPath, OriginMidPath, OriginBotPath);
 
     public virtual UpgradeModel? OriginUpgradeModel =>
-        OriginTiers.Any(i => i > 0) ? GameModel.GetUpgrade(OriginTowerModel.appliedUpgrades.Last()) : null;
+        OriginTiers.Any(i => i > 0) ? GameModel.GetUpgrade(OriginTowerModel?.appliedUpgrades.Last()) : null;
 
     public virtual bool IsValidOrigin(TowerModel current) => true;
-
-    public float UpgradeCost =>
-        OriginTower == null ? 0 : GameModel.GetUpgrade(OriginTowerModel!.appliedUpgrades.Last()).cost;
-    public float TowerCost => GameModel.GetTower(OriginTower).cost;
 
     /// <summary>
     /// Default is Sharpening Stone apply sound
@@ -175,6 +179,15 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
         if (this is not GodBoost)
         {
+            mod.ModSettings[Name + "Always"] = alwaysUsable = new ModSettingBool(false)
+            {
+                category = Always,
+                icon = Icon,
+                displayName = DisplayName,
+                description =
+                    $"Makes {DisplayName} always show up in the shop regardless of the Require Buff Origin Usable setting"
+            };
+
             mod.ModSettings[Name + "GodBoosting"] = includeInGodBoost = new ModSettingBool(DefaultGodBoost)
             {
                 category = GodBoosting,
@@ -202,6 +215,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     public override int CompareTo(ModContent other) => this.Compare(other, base.CompareTo, buffs => buffs
         .OrderBy(buff => buff.Order)
         .ThenBy(buff => buff.Hero)
+        .ThenBy(buff => buff.ParagonAllowed)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Alchemist)
         .ThenByDescending(buff => buff.OriginTower == TowerType.Desperado)
         .ThenByDescending(buff => buff.OriginTower == TowerType.EngineerMonkey)
@@ -244,7 +258,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         UpdateDiscounts();
     }
 
-    public int StackCount(Tower? tower) =>
+    public int GetStackCount(Tower? tower) =>
         tower?.GetMutatorById(Id)?.mutator.Is(out RateSupportModel.RateSupportMutator rateSupportMutator) == true
             ? rateSupportMutator.priority
             : 0;
@@ -269,7 +283,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
     public virtual bool CanApplyTo(Tower tower, ref string helperMessage)
     {
-        if (StackCount(tower) >= MaxStacks ||
+        if (GetStackCount(tower) >= MaxStacks ||
             MaxStacks == 1 && defaultMutators.Length > 0 &&
             defaultMutators.All(defaultMutator =>
                 tower.GetMutatorById(defaultMutator.id).Is(out var mutator) &&
@@ -279,7 +293,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             return false;
         }
 
-        if (tower.IsParagonBased())
+        if (tower.IsParagonBased() && !ParagonAllowed)
         {
             helperMessage = "Can't buff Paragons.";
             return false;
@@ -308,12 +322,20 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
 
         if (purchaseCost > -1)
         {
-            var count = StackCount(tower);
+            var count = GetStackCount(tower);
+            tower.RemoveMutatorsById(Id);
             var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, count + 1, null)
             {
                 cantBeAbsorbed = true
             };
-            tower.AddMutator(mutator);
+            if (tower.IsParagonBased())
+            {
+                tower.AddParagonMutator(mutator);
+            }
+            else
+            {
+                tower.AddMutator(mutator);
+            }
         }
 
         foreach (var mutatorId in MutatorIds)
@@ -332,18 +354,30 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         {
             if (affectsSubTowers)
             {
-                tower.AddMutatorIncludeSubTowers(mutator);
+                if (ParagonAllowed && tower.IsParagonBased())
+                {
+                    tower.AddParagonMutatorIncludeSubTowers(mutator);
+                }
+                else
+                {
+                    tower.AddMutatorIncludeSubTowers(mutator);
+                }
             }
             else
             {
-                tower.AddMutator(mutator);
+                if (ParagonAllowed && tower.IsParagonBased())
+                {
+                    tower.AddParagonMutator(mutator);
+                }
+                else
+                {
+                    tower.AddMutator(mutator);
+                }
             }
         }
     }
 
-    public virtual void ExtraMutation(TowerModel towerModel)
-    {
-    }
+    public virtual bool ExtraMutation(TowerModel towerModel) => false;
 
     public virtual void OnSaved(Tower tower, TowerSaveDataModel saveData)
     {
@@ -354,6 +388,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     }
 
     public virtual bool IsBlocked(TowerInventory ti) =>
+        !alwaysUsable &&
         OriginTower != null &&
         (ti.towerMaxes.TryGetValue(OriginTower, out var max) && max == 0 || OriginTiers.Where((tier, path) =>
             tier != 0 && ti.IsPathTierLocked(new Tower {towerModel = OriginTowerModel}, path, tier)).Any());

@@ -14,7 +14,7 @@ namespace BuffsInShop.Buff;
 
 public class ArtilleryCommand : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.StrikerJones;
+    public override string OriginTower => TowerType.StrikerJones;
     public override int OriginTopPath => 19;
     public override bool Hero => true;
 

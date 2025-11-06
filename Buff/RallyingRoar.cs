@@ -12,7 +12,7 @@ namespace BuffsInShop.Buff;
 
 public class RallyingRoar : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.PatFusty;
+    public override string OriginTower => TowerType.PatFusty;
     public override int OriginTopPath => 13;
     public override bool Hero => true;
 

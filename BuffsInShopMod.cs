@@ -131,7 +131,7 @@ public class BuffsInShopMod : BloonsTD6Mod
                 {
                     if (buff.HasBuff(tower, out var cost))
                     {
-                        Clipboard[buff] = (cost, buff.StackCount(tower));
+                        Clipboard[buff] = (cost, buff.GetStackCount(tower));
                     }
                 }
                 break;

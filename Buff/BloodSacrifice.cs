@@ -16,7 +16,7 @@ namespace BuffsInShop.Buff;
 
 public class BloodSacrifice : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.Adora;
+    public override string OriginTower => TowerType.Adora;
     public override int OriginTopPath => 19;
 
     public override bool Hero => true;
@@ -85,7 +85,7 @@ public class BloodSacrifice : ModBuffInShop
 
         if (sideEffects)
         {
-            var stacks = StackCount(tower);
+            var stacks = GetStackCount(tower);
             var debt = 250 * Math.Pow(2, stacks);
 
             TaskScheduler.ScheduleTask(() => Sim.AddBehavior<ImfLoanCollection>(new ImfLoanCollectionModel(

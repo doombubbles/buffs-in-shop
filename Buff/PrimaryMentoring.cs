@@ -32,7 +32,7 @@ public class PrimaryMentoring : ModBuffInShop<PrimaryTraining>
         yield return OriginTowerModel.GetBehavior<AbilityCooldownScaleSupportModel>().CreateMutator();
     }
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         var model = OriginTowerModel.GetBehavior<FreeUpgradeSupportModel>().Duplicate(Name);
 
@@ -40,5 +40,7 @@ public class PrimaryMentoring : ModBuffInShop<PrimaryTraining>
         model.appliesToOwningTower = true;
 
         towerModel.AddBehavior(model);
+
+        return true;
     }
 }

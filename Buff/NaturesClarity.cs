@@ -11,7 +11,7 @@ namespace BuffsInShop.Buff;
 
 public class NaturesClarity : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.ObynGreenfoot;
+    public override string OriginTower => TowerType.ObynGreenfoot;
     public override int OriginTopPath => 10;
     public override bool Hero => true;
 

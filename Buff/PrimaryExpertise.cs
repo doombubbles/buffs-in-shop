@@ -22,7 +22,7 @@ public class PrimaryExpertise : ModBuffInShop<PrimaryMentoring>
     public override IEnumerable<BehaviorMutator> GetMutators(Tower? tower) =>
         GetInstance<PrimaryMentoring>().GetMutators(OriginTowerModel);
 
-    public override void ExtraMutation(TowerModel towerModel)
+    public override bool ExtraMutation(TowerModel towerModel)
     {
         var model = OriginTowerModel.GetBehavior<FreeUpgradeSupportModel>().Duplicate(Name);
 
@@ -30,5 +30,7 @@ public class PrimaryExpertise : ModBuffInShop<PrimaryMentoring>
         model.appliesToOwningTower = true;
 
         towerModel.AddBehavior(model);
+
+        return true;
     }
 }

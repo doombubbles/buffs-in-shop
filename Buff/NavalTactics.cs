@@ -12,7 +12,7 @@ namespace BuffsInShop.Buff;
 
 public class NavalTactics : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.AdmiralBrickell;
+    public override string OriginTower => TowerType.AdmiralBrickell;
 
     public override bool IsValidOrigin(TowerModel current) => current.GetAbility()?.displayName == DisplayName;
 

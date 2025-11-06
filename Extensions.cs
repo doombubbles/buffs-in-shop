@@ -168,14 +168,8 @@ public static class Extensions
         freezeDurationSupportModel.mutatorId, freezeDurationSupportModel.additive,
         freezeDurationSupportModel.multiplier, freezeDurationSupportModel.GetBuffIndicatorModel());
 
-    public static SupportShinobiTactics.MutatorTower CreateMutator(
-        this SupportShinobiTacticsModel supportShinobiTacticsModel) => new(new SupportShinobiTactics
-    {
-        supportShinobiTacticsModel = supportShinobiTacticsModel
-    }, supportShinobiTacticsModel.mutatorId);
-
-
-
+    public static BananaCashIncreaseSupport.MutatorTower CreateMutator(
+        this BananaCashIncreaseSupportModel bananaCashIncreaseSupportModel) => new(bananaCashIncreaseSupportModel);
 
     public static int Compare<T, TBase>(this (T, TBase) elements, Func<IEnumerable<T>, IEnumerable<T>> orderBy,
         Func<TBase, int>? fallback = null) where T : TBase

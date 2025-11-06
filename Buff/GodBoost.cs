@@ -10,7 +10,7 @@ public class GodBoost : ModBuffInShop
     protected override int Order => 100;
     public override string BaseDescription => "Applies many other Buffs from the Shop at once.";
     public override string? OriginTower => null;
-    public override float BaseCost => 300000;
+    public override float BaseCost => 500000;
     public override int PriorityBoost => base.PriorityBoost + 10;
     public override bool SubsequentDiscount => true;
     public override bool AllowInChimps => false;

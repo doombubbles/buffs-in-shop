@@ -10,6 +10,8 @@ using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
 using BuffsInShop.Buff;
 using HarmonyLib;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame;
+using Il2CppNinjaKiwi.Common;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using MelonLoader;
 using Newtonsoft.Json;
@@ -30,6 +32,8 @@ internal static class Commands
         public override string Command => "buffsinshop";
 
         public override string Help => "Generate commands for Buffs In Shop";
+
+        public override bool IsAvailable => InGame.instance == null;
 
         public override bool Execute(ref string resultText) => ExplainSubcommands(out resultText);
     }
@@ -123,7 +127,7 @@ internal static class Commands
                  | Icon | Name | Description | Cost | Discount |
                  |:----:|:----:|:-----------:|:----:|:--------:|
                  {buffs.Select(buff =>
-                     $"""| <img src="Resources/{buff.Name}.png" width=50> | {buff.DisplayName} | {buff.BaseDescription} | ${buff.BaseCost} | {(buff.SubsequentDiscount ? "Yes" : "No")} |"""
+                     $"""| <img src="Resources/{buff.Name}.png" width=50> | {LocalizationManager.Instance.GetTextEnglish(buff.DisplayName)} | {LocalizationManager.Instance.GetTextEnglish(buff.BaseDescription)} | ${buff.BaseCost} | {(buff.SubsequentDiscount ? "Yes" : "No")} |"""
                  ).Join(delimiter: "\n")}
                  """;
 

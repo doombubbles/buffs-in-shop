@@ -7,13 +7,12 @@ namespace BuffsInShop;
 
 public abstract class ModBuffInShopGeraldo : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.Geraldo;
+    public override string OriginTower => TowerType.Geraldo;
     public override bool Hero => true;
 
     public virtual string GeraldoItemId => Name;
 
     public GeraldoItemModel GeraldoItem => GameModel.GetGeraldoItemWithName(GeraldoItemId);
-
 
     public override AudioClipReference PlacementSound =>
         GeraldoItem.GetDescendant<CreateSoundOnGeraldoItemModel>().soundId;

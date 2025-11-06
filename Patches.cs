@@ -30,9 +30,7 @@ internal static class RateSupportMutator_Mutate
         if (!ModBuffInShop.Cache.TryGetValue(__instance.id, out var buff) ||
             !model.Is(out TowerModel tower)) return true;
 
-        __result = true;
-
-        buff.ExtraMutation(tower);
+        __result = buff.ExtraMutation(tower);
 
         return false;
 

@@ -9,7 +9,7 @@ namespace BuffsInShop.Buff;
 
 public class PyrotechnicsExpert : ModBuffInShop
 {
-    public override string? OriginTower => TowerType.Gwendolin;
+    public override string OriginTower => TowerType.Gwendolin;
     public override int OriginTopPath => 19;
     public override bool Hero => true;
 

@@ -11,7 +11,7 @@ namespace BuffsInShop.Buff;
 
 public class SuperHeatedUp : ModBuffInShop<HeatedUp>
 {
-    public override string? OriginTower => TowerType.Gwendolin;
+    public override string OriginTower => TowerType.Gwendolin;
     public override int OriginTopPath => 17;
     public override bool Hero => true;
 
