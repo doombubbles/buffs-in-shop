@@ -51,7 +51,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     private ModSettingInt cost = null!;
     private ModSettingHotkey hotkey = null!;
     private ModSettingBool includeInGodBoost = null!;
-    private ModSettingBool alwaysUsable = null!;
+    private ModSettingBool? alwaysUsable;
+    public bool AlwaysUsable => alwaysUsable != null && alwaysUsable;
 
     public static Simulation Sim => InGame.Bridge.Simulation;
 
@@ -388,7 +389,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     }
 
     public virtual bool IsBlocked(TowerInventory ti) =>
-        !alwaysUsable &&
+        !AlwaysUsable &&
         OriginTower != null &&
         (ti.towerMaxes.TryGetValue(OriginTower, out var max) && max == 0 || OriginTiers.Where((tier, path) =>
             tier != 0 && ti.IsPathTierLocked(new Tower {towerModel = OriginTowerModel}, path, tier)).Any());

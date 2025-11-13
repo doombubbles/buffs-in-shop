@@ -1,5 +1,1 @@
-- Added many Hero buffs, Paragons Buffs, and stackable tower buffs to the shop
-- Added a new "God Boost" buff that applies all other buffs to a tower at once
-- Fixed Take Better Aim being applyable to a tower without Take Aim
-- Hid some buffs from the shop in Chimps that don't actually do anything
-- Added settings for allowing buffs to individually bypass the Require Buff Origin Usable setting
+- Fixed a console error showing up that didn't actually affect anything
