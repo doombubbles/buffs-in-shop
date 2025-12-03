@@ -16,7 +16,7 @@ public class NavalTactics : ModBuffInShop
 
     public override bool IsValidOrigin(TowerModel current) => current.GetAbility()?.displayName == DisplayName;
 
-    public override int OriginTopPath => 8;
+    public override int OriginTopPath => 9;
     public override bool Hero => true;
 
     public override string BaseDescription =>

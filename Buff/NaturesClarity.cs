@@ -12,7 +12,7 @@ namespace BuffsInShop.Buff;
 public class NaturesClarity : ModBuffInShop
 {
     public override string OriginTower => TowerType.ObynGreenfoot;
-    public override int OriginTopPath => 10;
+    public override int OriginTopPath => 11;
     public override bool Hero => true;
 
     public override string DisplayName => "Nature's Clarity";
@@ -36,6 +36,6 @@ public class NaturesClarity : ModBuffInShop
     public override IEnumerable<BehaviorMutator> GetMutators(Tower? tower)
     {
         yield return OriginTowerModel.GetBehaviors<RangeSupportModel>().Last().CreateMutator();
-        yield return OriginTowerModel.GetBehaviors<RangeSupportModel>().Last().CreateMutator();
+        yield return OriginTowerModel.GetBehaviors<PierceSupportModel>().Last().CreateMutator();
     }
 }

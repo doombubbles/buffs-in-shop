@@ -1,1 +1,1 @@
-- Fixed a console error showing up that didn't actually affect anything
+- Fixed for v52
