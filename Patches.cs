@@ -3,6 +3,7 @@ using System.Reflection;
 using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
+using BuffsInShop.Buff;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Profile;
@@ -17,25 +18,6 @@ using Il2CppAssets.Scripts.Utils;
 using Il2CppSystem.Collections.Generic;
 
 namespace BuffsInShop;
-
-/// <summary>
-/// Hijack a rate mutator for storing mod buff purchase info
-/// </summary>
-[HarmonyPatch(typeof(RateSupportModel.RateSupportMutator), nameof(RateSupportModel.RateSupportMutator.Mutate))]
-internal static class RateSupportMutator_Mutate
-{
-    [HarmonyPrefix]
-    internal static bool Prefix(RateSupportModel.RateSupportMutator __instance, Model model, ref bool __result)
-    {
-        if (!ModBuffInShop.Cache.TryGetValue(__instance.id, out var buff) ||
-            !model.Is(out TowerModel tower)) return true;
-
-        __result = buff.ExtraMutation(tower);
-
-        return false;
-
-    }
-}
 
 /// <summary>
 /// Load towers late after the mutations have been restored
@@ -140,5 +122,15 @@ internal static class TowerModel_GetPrimaryWeaponThrowMarkerHeight
 
         __result = 0;
         return false;
+    }
+}
+
+[HarmonyPatch(typeof(Simulation), nameof(Simulation.RoundEnd))]
+internal static class Simulation_RoundEnd
+{
+    [HarmonyPostfix]
+    internal static void Postfix(Simulation __instance)
+    {
+        ModContent.GetInstance<Ultraboost>().HandleBoosting(__instance);
     }
 }

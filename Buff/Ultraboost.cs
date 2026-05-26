@@ -4,6 +4,7 @@ using Il2CppAssets.Scripts.Models.Effects;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
+using Il2CppAssets.Scripts.Simulation;
 using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities.Behaviors;
@@ -89,13 +90,13 @@ public class Ultraboost : ModBuffInShop
         return true;
     }
 
-    public void HandleBoosting()
+    public void HandleBoosting(Simulation sim)
     {
-        var ultraboost = Sim.model
+        var ultraboost = sim.model
             .GetTower(TowerType.EngineerMonkey, 0, 5)
             .GetDescendant<OverclockPermanentModel>();
 
-        foreach (var tower in Sim.towerManager.GetTowers().AsIEnumerable())
+        foreach (var tower in sim.towerManager.GetTowers().AsIEnumerable())
         {
             if (HasBuff(tower) && tower.GetMutatorById(OverclockPermanentModel.MutatorId)?.mutator
                     .Is(out OverclockPermanentModel.OverclockPermanentMutator mutator) == true &&

@@ -40,7 +40,7 @@ public class BottleHotSauce : ModBuffInShopGeraldo
 
         if (sideEffects)
         {
-            var creature = Sim.towerManager.CreateTower(GameModel.GetTowerWithName("HotSauceCreatureTowerV2"),
+            var creature = tower.Sim.towerManager.CreateTower(tower.Sim.model.GetTowerWithName("HotSauceCreatureTowerV2"),
                 tower.Position, tower.owner, tower.GetAreaTowerIsPlacedOn().Id, tower.Id);
             creature.SetTargetType(tower.TargetType);
         }

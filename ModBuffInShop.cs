@@ -54,10 +54,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     private ModSettingBool? alwaysUsable;
     public bool AlwaysUsable => alwaysUsable != null && alwaysUsable;
 
-    public static Simulation Sim => InGame.Bridge.Simulation;
-
-    public static GameModel GameModel => InGame.instance == null ? Game.instance.model : Sim.model;
-
+    public static GameModel GameModel => GameModel.Current;
 
     public abstract string? OriginTower { get; }
     public abstract string BaseDescription { get; }
@@ -145,6 +142,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         Cache[Id] = this;
     }
 
+    internal BuffInShopMutator Mutator => field ??= new BuffInShopMutator(this);
+
     public override IEnumerable<ModContent> Load()
     {
         var baseCost = SavedBaseCost;
@@ -199,7 +198,8 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
             };
         }
 
-        return base.Load();
+        yield return this;
+        yield return Mutator;
     }
 
     public override void ModifyBaseTowerModel(TowerModel towerModel)
@@ -260,19 +260,15 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
     }
 
     public int GetStackCount(Tower? tower) =>
-        tower?.GetMutatorById(Id)?.mutator.Is(out RateSupportModel.RateSupportMutator rateSupportMutator) == true
-            ? rateSupportMutator.priority
-            : 0;
+        tower != null && Mutator.Get(tower, out var data) != null ? data.Stacks : 0;
 
-    public bool HasBuff(Tower tower) => tower.GetMutatorById(Id) != null;
+    public bool HasBuff(Tower tower) => Mutator.Get(tower) != null;
 
     public bool HasBuff(Tower tower, out float towerCost)
     {
-        var mutator = tower.GetMutatorById(Id);
-        towerCost = mutator?.mutator.Is(out RateSupportModel.RateSupportMutator fakeMutator) == true
-            ? fakeMutator.multiplier
-            : -1;
-        return mutator is not null;
+        var result = Mutator.Get(tower, out var data) != null;
+        towerCost = result ? data.Cost : 0f;
+        return result;
     }
 
     public virtual BehaviorMutator GetMutator(Tower? tower) => null!;
@@ -324,11 +320,12 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         if (purchaseCost > -1)
         {
             var count = GetStackCount(tower);
-            tower.RemoveMutatorsById(Id);
-            var mutator = new RateSupportModel.RateSupportMutator(true, Id, purchaseCost, count + 1, null)
+            tower.RemoveMutatorsById(Mutator.MutatorId);
+            var mutator = Mutator.Create(new()
             {
-                cantBeAbsorbed = true
-            };
+                Cost = purchaseCost,
+                Stacks = count + 1,
+            });
             if (tower.IsParagonBased())
             {
                 tower.AddParagonMutator(mutator);
@@ -392,12 +389,14 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
         !AlwaysUsable &&
         OriginTower != null &&
         (ti.towerMaxes.TryGetValue(OriginTower, out var max) && max == 0 || OriginTiers.Where((tier, path) =>
-            tier != 0 && ti.IsPathTierLocked(new Tower {towerModel = OriginTowerModel}, path, tier)).Any());
+            tier != 0 && ti.IsPathTierLocked(new Tower { towerModel = OriginTowerModel }, path, tier)).Any());
 
     internal static void UpdateDiscounts()
     {
-        var discounts = InGame.Bridge.Simulation.GetTowerInventory(InGame.Bridge.MyPlayerNumber).towerDiscounts;
-        var towers = InGame.Bridge.Simulation.towerManager.GetTowers().ToArray();
+        if (Simulation.Current == null) return;
+
+        var discounts = Simulation.Current.GetTowerInventory(InGame.Bridge.MyPlayerNumber).towerDiscounts;
+        var towers = Simulation.Current.towerManager.GetTowers().ToArray();
 
         foreach (var buff in GetContent<ModBuffInShop>().Where(buff => buff.SubsequentDiscount))
         {
@@ -423,7 +422,7 @@ public abstract class ModBuffInShop : ModFakeTower<Buffs>, IModSettings
                 discounts.RemoveAt(i);
             }
 
-            var button = ShopMenu.instance.GetTowerButtonFromBaseId(buff.Id);
+            var button = ShopMenu.instance?.GetTowerButtonFromBaseId(buff.Id);
 
             if (button != null && button.GetComponentInChildren<ITowerPurchaseButton>().Is(out var purchaseButton))
             {

@@ -1,1 +1,2 @@
-- Fixed for v52
+- Updated internals to use the new `ModMutator` class from Mod Helper 3.6.0
+- Fixed some minor bugs from v54

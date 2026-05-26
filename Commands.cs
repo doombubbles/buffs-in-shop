@@ -10,9 +10,11 @@ using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
 using BuffsInShop.Buff;
 using HarmonyLib;
+using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppNinjaKiwi.Common;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
+using Il2CppNinjaKiwi.Localization;
 using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -63,10 +65,11 @@ internal static class Commands
                         .Select(mutator => mutator.buffIndicator)
                         .Where(buffIndicator => buffIndicator != null && !string.IsNullOrEmpty(buffIndicator.FullName))
                         .OrderByDescending(buffIndicator => buffIndicator.iconName)
-                        .First()
-                        .GetIcon();
+                        .Select(buffIndicator => buffIndicator.iconName)
+                        .Select(GameData.Instance.buffIconSprites.GetSpriteRef)
+                        .First(spriteRef => spriteRef != null);
 
-                    getSprite = ResourceLoader.LoadAsync<Sprite>(buffIndicator.icon.AssetGUID);
+                    getSprite = ResourceLoader.LoadAsync<Sprite>(buffIndicator.AssetGUID);
                 }
                 catch (Exception e)
                 {

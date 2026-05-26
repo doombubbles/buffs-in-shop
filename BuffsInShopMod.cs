@@ -6,11 +6,9 @@ using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Api.ModOptions;
 using BTD_Mod_Helper.Extensions;
 using BuffsInShop;
-using BuffsInShop.Buff;
 using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Models.Gameplay.Mods;
 using Il2CppAssets.Scripts.Models.Profile;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
@@ -64,8 +62,6 @@ public class BuffsInShopMod : BloonsTD6Mod
         }
     }
 
-    public override void OnRoundEnd() => ModContent.GetInstance<Ultraboost>().HandleBoosting();
-
     public override void OnTowerDestroyed(Tower tower)
     {
         foreach (var buff in ModContent.GetContent<ModBuffInShop>().Where(buff => buff.HasBuff(tower)))
@@ -84,11 +80,11 @@ public class BuffsInShopMod : BloonsTD6Mod
         {
             if (ModBuffInShop.Cache.TryGetValue(mutator.mutator.id, out var buff))
             {
-                var fakeMutator = mutator.mutator.Cast<RateSupportModel.RateSupportMutator>();
-                saveData.metaData[buff.Id] = $"{fakeMutator.multiplier}";
-                if (fakeMutator.priority > 1)
+                var data = buff.Mutator.GetData(mutator.mutator);
+                saveData.metaData[buff.Id] = $"{data.Cost}";
+                if (data.Stacks > 1)
                 {
-                    saveData.metaData[buff.Id + "Count"] = fakeMutator.priority.ToString();
+                    saveData.metaData[buff.Id + "Count"] = data.Stacks.ToString();
                 }
                 buff.OnSaved(tower, saveData);
             }

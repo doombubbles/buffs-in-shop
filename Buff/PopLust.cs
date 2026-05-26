@@ -47,9 +47,9 @@ public class PopLust : ModBuffInShop
 
         if (sideEffects)
         {
-            foreach (var poplustSupport in Sim.factory.GetUncast<PoplustSupport>().ToArray().Take(1))
+            foreach (var poplustSupport in tower.Sim.factory.GetUncast<PoplustSupport>().ToArray().Take(1))
             {
-                poplustSupport.UpdateMutatorForTower(tower, Sim);
+                poplustSupport.UpdateMutatorForTower(tower, tower.Sim);
             }
         }
     }

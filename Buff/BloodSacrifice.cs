@@ -39,7 +39,7 @@ public class BloodSacrifice : ModBuffInShop
 
     public override bool CanApplyTo(Tower tower, ref string helperMessage)
     {
-        if (Sim.GetBehaviors().ToArray().OfIl2CppType<ImfLoanCollection>()
+        if (tower.Sim.GetBehaviors().ToArray().OfIl2CppType<ImfLoanCollection>()
             .Any(loan => loan.imfLoanCollectionModel.name.Contains(Name + tower.Id)))
         {
             helperMessage = "Still in debt from last purchase";
@@ -88,7 +88,7 @@ public class BloodSacrifice : ModBuffInShop
             var stacks = GetStackCount(tower);
             var debt = 250 * Math.Pow(2, stacks);
 
-            TaskScheduler.ScheduleTask(() => Sim.AddBehavior<ImfLoanCollection>(new ImfLoanCollectionModel(
+            TaskScheduler.ScheduleTask(() => tower.Sim.AddBehavior<ImfLoanCollection>(new ImfLoanCollectionModel(
                 Name + tower.Id, .5f, (float) debt)));
         }
     }

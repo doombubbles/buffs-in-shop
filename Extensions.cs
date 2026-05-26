@@ -22,10 +22,6 @@ namespace BuffsInShop;
 
 public static class Extensions
 {
-    public static BuffIconSprite GetIcon(this BuffIndicatorModel buffIndicator) =>
-        GameData.Instance.buffIconSprites.buffIconSprites
-            .FirstOrDefault(sprite => sprite.buffId == buffIndicator.iconName);
-
     public static RateSupportModel.RateSupportMutator CreateMutator(this RateSupportModel rateSupport) =>
         new(rateSupport.isUnique, rateSupport.mutatorId, rateSupport.multiplier, rateSupport.priority,
             rateSupport.GetBuffIndicatorModel(), false, rateSupport.buffDisplayModel);
