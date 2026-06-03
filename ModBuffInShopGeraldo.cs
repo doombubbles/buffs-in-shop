@@ -1,4 +1,5 @@
-﻿using Il2CppAssets.Scripts.Models.Effects;
+﻿using BTD_Mod_Helper.Extensions;
+using Il2CppAssets.Scripts.Models.Effects;
 using Il2CppAssets.Scripts.Models.GeraldoItems;
 using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
@@ -22,7 +23,7 @@ public abstract class ModBuffInShopGeraldo : ModBuffInShop
         get
         {
             var effect = GeraldoItem.GetDescendant<CreateEffectOnGeraldoItemModel>();
-            return new EffectModel("", effect.effectId, 1, effect.lifespan);
+            return EffectModel.Create(new() { assetId = effect.effectId, lifespan = effect.lifespan });
         }
     }
 

@@ -85,7 +85,13 @@ public class Ultraboost : ModBuffInShop
             towerModel.RemoveBehavior(behavior);
         }
 
-        towerModel.AddBehavior(new DisplayModel("Overclock", overclock.buffDisplayPath, -1, DisplayCategory.Buff));
+        towerModel.AddBehavior(DisplayModel.Create(new()
+        {
+            name = "Overclock",
+            display = overclock.buffDisplayPath,
+            layer = -1,
+            category = DisplayCategory.Buff
+        }));
 
         return true;
     }

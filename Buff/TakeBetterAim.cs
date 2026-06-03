@@ -44,7 +44,13 @@ public class TakeBetterAim : ModBuffInShop<TakeAim>
             towerModel.RemoveBehavior(behavior);
         }
 
-        towerModel.AddBehavior(new DisplayModel(nameof(TakeAim), takeAim.buffDisplayPath, -1, DisplayCategory.Buff));
+        towerModel.AddBehavior(DisplayModel.Create(new()
+        {
+            name = nameof(TakeAim),
+            display = takeAim.buffDisplayPath,
+            layer = -1,
+            category = DisplayCategory.Buff
+        }));
 
         return true;
     }

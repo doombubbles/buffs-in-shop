@@ -52,9 +52,17 @@ public class EnergizedFully : ModBuffInShop<Energized>
         {
             yield return new AbilityCooldownScaleSupport.MutatorTower(new AbilityCooldownScaleSupport
             {
-                abilityCooldownScaleSupportModel = new AbilityCooldownScaleSupportModel(
-                    "SubmergeAbilityCooldownScale", true, submerge.abilityCooldownSpeedScale, true, false,
-                    filters, submerge.buffLocsName, submerge.buffIconName, false, submerge.supportMutatorPriority)
+                abilityCooldownScaleSupportModel = AbilityCooldownScaleSupportModel.Create(new()
+                {
+                    name = "SubmergeAbilityCooldownScale",
+                    isUnique = true,
+                    abilityCooldownSpeedScale = submerge.abilityCooldownSpeedScale,
+                    affectsOnlyWater = true,
+                    filters = filters,
+                    buffLocsName = submerge.buffLocsName,
+                    buffIconName = submerge.buffIconName,
+                    mutatorPriority = submerge.supportMutatorPriority
+                })
             }, submerge.abilityCooldownSpeedScale, "SubmergeAbilityCooldownScale");
         }
 
@@ -62,8 +70,15 @@ public class EnergizedFully : ModBuffInShop<Energized>
         {
             yield return new HeroXpScaleSupport.MutatorTower(new HeroXpScaleSupport
             {
-                heroXpScaleSupportModel = new HeroXpScaleSupportModel("SubmergeHeroXpScale", true, submerge.heroXpScale,
-                    filters, submerge.buffLocsName, submerge.buffIconName)
+                heroXpScaleSupportModel = HeroXpScaleSupportModel.Create(new()
+                {
+                    name = "SubmergeHeroXpScale",
+                    isUnique = true,
+                    heroXpScale = submerge.heroXpScale,
+                    filters = filters,
+                    buffLocsName = submerge.buffLocsName,
+                    buffIconName = submerge.buffIconName
+                })
             });
         }
     }

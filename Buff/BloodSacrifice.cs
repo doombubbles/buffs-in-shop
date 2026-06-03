@@ -88,8 +88,12 @@ public class BloodSacrifice : ModBuffInShop
             var stacks = GetStackCount(tower);
             var debt = 250 * Math.Pow(2, stacks);
 
-            TaskScheduler.ScheduleTask(() => tower.Sim.AddBehavior<ImfLoanCollection>(new ImfLoanCollectionModel(
-                Name + tower.Id, .5f, (float) debt)));
+            TaskScheduler.ScheduleTask(() => tower.Sim.AddBehavior<ImfLoanCollection>(ImfLoanCollectionModel.Create(new()
+            {
+                name = Name + tower.Id,
+                collectionRate = .5f,
+                amount = (float) debt
+            })));
         }
     }
 }

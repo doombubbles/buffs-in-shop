@@ -51,10 +51,16 @@ public class ParagonSubCommanded : ModBuffInShopParagon
         {
             yield return new AbilityCooldownScaleSupport.MutatorTower(new AbilityCooldownScaleSupport
             {
-                abilityCooldownScaleSupportModel = new AbilityCooldownScaleSupportModel(
-                    "SubmergeAbilityCooldownScaleParagon", true, submerge.abilityCooldownSpeedScaleParagon, false,
-                    false, filters, submerge.buffLocsName, submerge.buffIconName, false,
-                    submerge.supportMutatorPriority)
+                abilityCooldownScaleSupportModel = AbilityCooldownScaleSupportModel.Create(new()
+                {
+                    name = "SubmergeAbilityCooldownScaleParagon",
+                    isUnique = true,
+                    abilityCooldownSpeedScale = submerge.abilityCooldownSpeedScaleParagon,
+                    filters = filters,
+                    buffLocsName = submerge.buffLocsName,
+                    buffIconName = submerge.buffIconName,
+                    mutatorPriority = submerge.supportMutatorPriority
+                })
             }, submerge.abilityCooldownSpeedScaleParagon, "SubmergeAbilityCooldownScaleParagon");
         }
         else

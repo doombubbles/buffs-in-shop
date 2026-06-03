@@ -51,7 +51,13 @@ public class TakeAim : ModBuffInShop
 
         if (!towerModel.behaviors.Any(model => model.Is<DisplayModel>() && model.name.EndsWith(Name)))
         {
-            towerModel.AddBehavior(new DisplayModel(Name, takeAim.buffDisplayPath, -1, DisplayCategory.Buff));
+            towerModel.AddBehavior(DisplayModel.Create(new()
+            {
+                name = Name,
+                display = takeAim.buffDisplayPath,
+                layer = -1,
+                category = DisplayCategory.Buff
+            }));
         }
 
         return true;

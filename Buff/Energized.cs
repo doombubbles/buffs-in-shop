@@ -47,10 +47,16 @@ public class Energized : ModBuffInShop
 
         yield return new AbilityCooldownScaleSupport.MutatorTower(new AbilityCooldownScaleSupport
         {
-            abilityCooldownScaleSupportModel = new AbilityCooldownScaleSupportModel(
-                "SubmergeAbilityCooldownScaleGlobal", true,
-                submerge.abilityCooldownSpeedScaleGlobal, false, false, filters, submerge.buffLocsName,
-                "BuffIconSubHalf5xx", false, submerge.supportMutatorPriority)
+            abilityCooldownScaleSupportModel = AbilityCooldownScaleSupportModel.Create(new()
+            {
+                name = "SubmergeAbilityCooldownScaleGlobal",
+                isUnique = true,
+                abilityCooldownSpeedScale = submerge.abilityCooldownSpeedScaleGlobal,
+                filters = filters,
+                buffLocsName = submerge.buffLocsName,
+                buffIconName = "BuffIconSubHalf5xx",
+                mutatorPriority = submerge.supportMutatorPriority
+            })
         }, submerge.abilityCooldownSpeedScaleGlobal, "SubmergeAbilityCooldownScaleGlobal");
     }
 }

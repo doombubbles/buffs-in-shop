@@ -87,8 +87,12 @@ public class SunTemple : ModBuffInShop
             .OfIl2CppType<DiscountZoneModel>()
             .Last();
 
-        towerModel.AddBehavior(new DiscountZoneModModel(discount.stackName, discount.discountMultiplier,
-            ModelSerializer.SerializeModel(discount)));
+        towerModel.AddBehavior(DiscountZoneModModel.Create(new()
+        {
+            name = discount.stackName,
+            additionalMultiplier = discount.discountMultiplier,
+            specificScriptId = ModelSerializer.SerializeModel(discount)
+        }));
 
         return true;
     }

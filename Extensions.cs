@@ -100,10 +100,16 @@ public static class Extensions
     public static PierceSupport.MutatorTower CreateMutator(
         this ActivatePierceSupportZoneModel activatePierceSupportZoneModel) => new(new PierceSupport
     {
-        pierceSupportModel = new PierceSupportModel("", activatePierceSupportZoneModel.isUnique,
-            activatePierceSupportZoneModel.pierceIncrease, activatePierceSupportZoneModel.mutatorId,
-            activatePierceSupportZoneModel.filters, activatePierceSupportZoneModel.isGlobal,
-            activatePierceSupportZoneModel.buffLocsName, activatePierceSupportZoneModel.buffIconName)
+        pierceSupportModel = PierceSupportModel.Create(new()
+        {
+            isUnique = activatePierceSupportZoneModel.isUnique,
+            pierce = activatePierceSupportZoneModel.pierceIncrease,
+            mutatorId = activatePierceSupportZoneModel.mutatorId,
+            filters = activatePierceSupportZoneModel.filters,
+            isGlobal = activatePierceSupportZoneModel.isGlobal,
+            buffLocsName = activatePierceSupportZoneModel.buffLocsName,
+            buffIconName = activatePierceSupportZoneModel.buffIconName
+        })
     });
 
     public static DamageSupport.MutatorTower CreateMutator(
@@ -114,10 +120,15 @@ public static class Extensions
     public static VisibilitySupport.MutatorTower CreateMutator(
         this ActivateVisibilitySupportZoneModel activateVisibilitySupportZoneModel) => new(new VisibilitySupport
     {
-        visibilitySupportModel = new VisibilitySupportModel("", activateVisibilitySupportZoneModel.isUnique,
-            activateVisibilitySupportZoneModel.mutatorId, activateVisibilitySupportZoneModel.isGlobal,
-            activateVisibilitySupportZoneModel.filters, activateVisibilitySupportZoneModel.buffLocsName,
-            activateVisibilitySupportZoneModel.buffIconName)
+        visibilitySupportModel = VisibilitySupportModel.Create(new()
+        {
+            isUnique = activateVisibilitySupportZoneModel.isUnique,
+            mutatorId = activateVisibilitySupportZoneModel.mutatorId,
+            isGlobal = activateVisibilitySupportZoneModel.isGlobal,
+            filters = activateVisibilitySupportZoneModel.filters,
+            buffLocsName = activateVisibilitySupportZoneModel.buffLocsName,
+            buffIconName = activateVisibilitySupportZoneModel.buffIconName
+        })
     });
 
     public static DamageTypeSupport.MutatorTower CreateMutator(

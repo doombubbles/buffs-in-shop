@@ -1,2 +1,2 @@
-- Updated internals to use the new `ModMutator` class from Mod Helper 3.6.0
-- Fixed some minor bugs from v54
+- Updated for BTD6 v55
+- Internally switched to using some newer Mod Helper extensions

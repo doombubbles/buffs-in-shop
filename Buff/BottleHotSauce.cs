@@ -1,4 +1,5 @@
-﻿using Il2CppAssets.Scripts.Models.Effects;
+﻿using BTD_Mod_Helper.Extensions;
+using Il2CppAssets.Scripts.Models.Effects;
 using Il2CppAssets.Scripts.Models.GeraldoItems;
 using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Simulation.Towers;
@@ -14,7 +15,7 @@ public class BottleHotSauce : ModBuffInShopGeraldo
         get
         {
             var effect = GeraldoItem.GetDescendant<BottleHotSauceBehaviorModel>().effectAtTowerId;
-            return new EffectModel("", effect, 1, 1);
+            return EffectModel.Create(new() { assetId = effect, lifespan = 1 });
         }
     }
 

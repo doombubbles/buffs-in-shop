@@ -57,15 +57,19 @@ public class ParagonOverclock : ModBuffInShopParagon
     {
         var overclock = OriginTowerModel.GetDescendant<OverclockModel>();
 
-        towerModel.AddBehavior(new RangeSupportModel("Overclock", true, overclock.rateModifier,
-            overclock.villageRangeModifier, overclock.mutatorId, null,
-            false, overclock.buffLocsName, overclock.buffIconName)
+        towerModel.AddBehavior(RangeSupportModel.Create(new()
         {
-            appliesToOwningTower = false,
+            name = "Overclock",
+            isUnique = true,
+            multiplier = overclock.rateModifier,
+            additive = overclock.villageRangeModifier,
+            mutatorId = overclock.mutatorId,
+            buffLocsName = overclock.buffLocsName,
+            buffIconName = overclock.buffIconName,
             showBuffIcon = true,
             isCustomRadius = true,
             customRadius = overclock.paragonZoneRange
-        });
+        }));
 
         return true;
     }

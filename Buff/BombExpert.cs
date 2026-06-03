@@ -28,7 +28,11 @@ public class BombExpert : ModBuffInShop
         bombExport.buffLocsName = mainBuff.buffLocsName;
         bombExport.buffIconName = mainBuff.buffIconName;
 
-        bombExport.AddChildDependant(new BuffIndicatorModel("", bombExport.buffLocsName, bombExport.buffIconName));
+        bombExport.AddChildDependant(BuffIndicatorModel.Create(new()
+        {
+            buffName = bombExport.buffLocsName,
+            iconName = bombExport.buffIconName
+        }));
 
         yield return bombExport.CreateMutator();
 

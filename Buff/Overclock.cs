@@ -52,7 +52,13 @@ public class Overclock : ModBuffInShop
         if (!towerModel.behaviors
                 .Any(model => model.Is<DisplayModel>() && model.name.EndsWith(Name)))
         {
-            towerModel.AddBehavior(new DisplayModel(Name, overclock.buffDisplayPath, -1, DisplayCategory.Buff));
+            towerModel.AddBehavior(DisplayModel.Create(new()
+            {
+                name = Name,
+                display = overclock.buffDisplayPath,
+                layer = -1,
+                category = DisplayCategory.Buff
+            }));
         }
 
         return true;

@@ -49,7 +49,7 @@ public class BuffsInShopMod : BloonsTD6Mod
 
         foreach (var buff in ModContent.GetContent<ModBuffInShop>().Where(buff => !buff.AllowInChimps))
         {
-            chimps.AddMutator(new LockTowerModModel("", buff.Id));
+            chimps.AddMutator(LockTowerModModel.Create(new() { towerToLock = buff.Id }));
         }
     }
 
