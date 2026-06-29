@@ -1,0 +1,31 @@
+[package]
+name = "BuffsInShop"
+namespace = "doombubbles"
+description = "Adds many tower buffs to the in game shop that can be directly purchased for towers. See the home page Readme for full details."
+websiteUrl = "https://github.com/doombubbles/BuffsInShop"
+
+[package.dependencies]
+LavaGang-MelonLoader = "0.7.3"
+doombubbles-Btd6ModHelper = "3.6.5"
+
+[build]
+icon = "./Buffs-Button.png"
+readme = "./README.md"
+outdir = "bin"
+
+[[build.copy]]
+source = "./bin/Release/BuffsInShop.dll"
+target = "BuffsInShop.dll"
+
+[[build.copy]]
+source = "./CHANGELOG.md"
+target = "./CHANGELOG.md"
+
+[[build.copy]]
+source = "./LICENSE"
+target = "./LICENSE"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = ["bloons-td-6"]
+categories = ["mods"]

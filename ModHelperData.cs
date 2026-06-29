@@ -13,7 +13,8 @@ public static class ModHelperData
         """;
 
     public const string RepoOwner = "doombubbles";
-    public const string RepoName = "buffs-in-shop";
+    public const string PrevRepoName = "buffs-in-shop";
+    public const string RepoName = "BuffsInShop";
 
     public const string Icon = "Buffs-Button.png";
 }

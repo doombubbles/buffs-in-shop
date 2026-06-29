@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 
 [assembly: MelonInfo(typeof(BuffsInShopMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
+[assembly: MelonGame("Ninja Kiwi", "BloonsTD6-Epic")]
 namespace BuffsInShop;
 
 public class BuffsInShopMod : BloonsTD6Mod
